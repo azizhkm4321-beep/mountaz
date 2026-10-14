@@ -1,4 +1,4 @@
-const MOUNTAINS = [
+const mountains = [
   { name: "Prau", height: 2565, price: 15000, location: "Jawa Tengah" },
   { name: "Andong", height: 1726, price: 20000, location: "Jawa Tengah" },
   { name: "Merbabu", height: 3145, price: 25000, location: "Jawa Tengah" },
@@ -6,365 +6,370 @@ const MOUNTAINS = [
   { name: "Rinjani", height: 3726, price: 50000, location: "Nusa Tenggara Barat" }
 ];
 
-const CONCEPTS = {
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => [...document.querySelectorAll(selector)];
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Loader
+window.addEventListener("load", () => {
+  window.setTimeout(() => $("#pageLoader").classList.add("done"), 500);
+});
+
+// Navbar and mobile menu
+const navbar = $("#navbar");
+window.addEventListener("scroll", () => navbar.classList.toggle("scrolled", window.scrollY > 35), { passive: true });
+$("#menuToggle").addEventListener("click", () => {
+  const opened = $("#navLinks").classList.toggle("open");
+  $("#menuToggle").setAttribute("aria-expanded", String(opened));
+});
+$$(".nav-link, .nav-cta, .brand").forEach(link => link.addEventListener("click", () => {
+  $("#navLinks").classList.remove("open");
+  $("#menuToggle").setAttribute("aria-expanded", "false");
+}));
+
+// Reveal sections on scroll
+if ("IntersectionObserver" in window && !reduceMotion) {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  $$(".reveal").forEach(el => observer.observe(el));
+} else {
+  $$(".reveal").forEach(el => el.classList.add("visible"));
+}
+
+// Active nav
+const sectionObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      $$(".nav-link").forEach(link => link.classList.toggle("active", link.getAttribute("href") === `#${entry.target.id}`));
+    }
+  });
+}, { rootMargin: "-35% 0px -55% 0px" });
+["home", "materi", "sorting", "searching"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) sectionObserver.observe(el);
+});
+// The algorithm workspace uses tabs within the sorting section; update nav for searching tab.
+$$('[data-tab]').forEach(tab => tab.addEventListener("click", () => {
+  if (tab.dataset.tab === "searchPanel") {
+    $$(".nav-link").forEach(link => link.classList.toggle("active", link.getAttribute("href") === "#searching"));
+    history.replaceState(null, "", "#searching");
+  } else {
+    $$(".nav-link").forEach(link => link.classList.toggle("active", link.getAttribute("href") === "#sorting"));
+    history.replaceState(null, "", "#sorting");
+  }
+}));
+
+// Concept modal content
+const concepts = {
   array: {
     title: "Array",
-    desc: "Array menyimpan sejumlah elemen bertipe sama pada urutan indeks. Di C++, indeks dimulai dari 0, sehingga elemen pertama berada di indeks 0.",
-    ex: [["12", "idx 0"], ["24", "idx 1"], ["36", "idx 2"], ["48", "idx 3"]],
+    description: "Array adalah struktur data yang menyimpan sejumlah elemen dengan tipe yang sama pada urutan indeks. Dalam C++, indeks array dimulai dari 0, sehingga elemen pertama berada pada indeks 0.",
+    example: '<div class="example-label">VISUALISASI INDEKS</div><div class="modal-array"><span>12<br><small>idx 0</small></span><span>24<br><small>idx 1</small></span><span>36<br><small>idx 2</small></span><span>48<br><small>idx 3</small></span></div>',
     code: "int ketinggian[] = {12, 24, 36, 48};\ncout << ketinggian[2]; // 36"
   },
   pointer: {
     title: "Pointer",
-    desc: "Pointer adalah variabel yang menyimpan alamat memori variabel lain. Operator & mengambil alamat, sedangkan * dipakai untuk mengakses nilai di alamat tersebut.",
-    ex: [["42", "nilai"], ["0x01", "alamat"], ["ptr →", "pointer"]],
+    description: "Pointer adalah variabel yang menyimpan alamat memori variabel lain. Operator & mengambil alamat, sedangkan * digunakan untuk mengakses nilai melalui pointer (dereference). Alamat di ilustrasi ini bersifat simulasi.",
+    example: '<div class="example-label">HUBUNGAN POINTER</div><div class="modal-array"><span>nilai<br><small>42</small></span><span>alamat<br><small>0x01*</small></span><span>pointer<br><small>ptr →</small></span></div>',
     code: "int nilai = 42;\nint* ptr = &nilai;\ncout << *ptr; // 42"
   },
   struct: {
     title: "Struct",
-    desc: "Struct mengelompokkan beberapa anggota dengan tipe data yang boleh berbeda. Cocok untuk merepresentasikan satu entitas, misalnya informasi gunung.",
-    ex: [["Prau", "nama"], ["2565", "tinggi"], ["Jateng", "lokasi"]],
+    description: "Struct adalah tipe data bentukan yang mengelompokkan beberapa anggota dengan tipe data yang dapat berbeda. Cocok untuk merepresentasikan satu entitas, misalnya informasi gunung.",
+    example: '<div class="example-label">OBJEK GUNUNG</div><div class="modal-array"><span>nama<br><small>Prau</small></span><span>tinggi<br><small>2565</small></span><span>lokasi<br><small>Jateng</small></span></div>',
     code: 'struct Gunung {\n    string nama;\n    int ketinggian;\n    string lokasi;\n};\nGunung prau = {"Prau", 2565, "Jateng"};'
   }
 };
-
-const $ = (s) => document.querySelector(s);
-const $$ = (s) => [...document.querySelectorAll(s)];
-const fmt = (n) => n.toLocaleString("id-ID");
-const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-/* ===== Loader, progress bar, navbar ===== */
-const hideLoader = () => $("#loader").classList.add("done");
-addEventListener("load", () => setTimeout(hideLoader, 300));
-setTimeout(hideLoader, 2500);
-
-addEventListener("scroll", () => {
-  const max = document.documentElement.scrollHeight - innerHeight;
-  $("#navbar").classList.toggle("scrolled", scrollY > 30);
-  $("#progress").style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
-}, { passive: true });
-
-/* ===== Toast ===== */
-let toastTimer;
-function toast(msg) {
-  const t = $("#toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
-}
-
-/* ===== Tema gelap / terang ===== */
-$("#themeToggle").addEventListener("click", () => {
-  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-  document.documentElement.dataset.theme = next;
-  try { localStorage.setItem("mountaz-theme", next); } catch (e) {}
-  toast(next === "dark" ? "Mode gelap aktif" : "Mode terang aktif");
-});
-
-/* ===== Menu mobile ===== */
-const menuBtn = $("#menuToggle"), navLinks = $("#navLinks");
-function setMenu(open) {
-  navLinks.classList.toggle("open", open);
-  menuBtn.classList.toggle("open", open);
-  menuBtn.setAttribute("aria-expanded", String(open));
-}
-menuBtn.addEventListener("click", () => setMenu(!navLinks.classList.contains("open")));
-$$(".nav-link").forEach((a) => a.addEventListener("click", () => setMenu(false)));
-
-/* ===== Animasi saat scroll ===== */
-function countUp(el) {
-  const end = +el.dataset.count, t0 = performance.now();
-  el.textContent = "0";
-  const tick = (now) => {
-    const p = Math.min((now - t0) / 1000, 1);
-    el.textContent = Math.round(end * p);
-    if (p < 1) requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-}
-const revealIO = new IntersectionObserver((entries) =>
-    const revealIO = new IntersectionObserver((entries) => {
-  entries.forEach((e) => {
-    if (!e.isIntersecting) return;
-    e.target.classList.add("in");
-    e.target.querySelectorAll("[data-count]").forEach(countUp);
-    revealIO.unobserve(e.target);
-  });
-}, { threshold: 0.12 });
-$$(".reveal").forEach((el) => (reduceMotion ? el.classList.add("in") : revealIO.observe(el)));
-
-const navIO = new IntersectionObserver((entries) => {
-  entries.forEach((e) => {
-    if (!e.isIntersecting) return;
-    $$(".nav-link").forEach((a) => a.classList.toggle("active", a.hash === "#" + e.target.id));
-  });
-}, { rootMargin: "-45% 0px -50% 0px" });
-["home", "materi", "sorting", "searching"].forEach((id) => navIO.observe(document.getElementById(id)));
-
-/* ===== Modal konsep ===== */
-const modal = $("#modal");
-let lastFocus = null, hideTimer = null;
-
+const modal = $("#conceptModal");
 function openConcept(key) {
-  const c = CONCEPTS[key];
-  lastFocus = document.activeElement;
-  $("#modalTitle").textContent = c.title;
-  $("#modalDesc").textContent = c.desc;
-  $("#modalExample").innerHTML = c.ex.map(([v, s]) => `<span>${v}<small>${s}</small></span>`).join("");
-  $("#modalCode").textContent = c.code;
-  clearTimeout(hideTimer);
+  const data = concepts[key];
+  if (!data) return;
+  $("#modalTitle").textContent = data.title;
+  $("#modalDescription").textContent = data.description;
+  $("#modalExample").innerHTML = data.example;
+  $("#modalCode").textContent = data.code;
   modal.hidden = false;
   document.body.style.overflow = "hidden";
-  requestAnimationFrame(() => {
-    modal.classList.add("open");
-    $("#modalClose").focus();
+  $("#modalClose").focus();
+}
+function closeConcept() { modal.hidden = true; document.body.style.overflow = ""; }
+$$("[data-open]").forEach(card => {
+  card.addEventListener("click", () => openConcept(card.dataset.open));
+  card.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openConcept(card.dataset.open); }
   });
-}
-
-function closeConcept() {
-  if (!modal.classList.contains("open")) return;
-  modal.classList.remove("open");
-  document.body.style.overflow = "";
-  hideTimer = setTimeout(() => (modal.hidden = true), 300);
-  lastFocus?.focus();
-}
-
-$$("[data-concept]").forEach((b) => b.addEventListener("click", () => openConcept(b.dataset.concept)));
+});
 $("#modalClose").addEventListener("click", closeConcept);
 $("#modalDone").addEventListener("click", closeConcept);
-modal.addEventListener("click", (e) => { if (e.target === modal) closeConcept(); });
-modal.addEventListener("keydown", (e) => {
-  if (e.key !== "Tab") return;
-  const first = $("#modalClose"), last = $("#modalDone");
-  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-});
-addEventListener("keydown", (e) => {
-  if (e.key === "Escape") { closeConcept(); setMenu(false); }
-});
+modal.addEventListener("click", event => { if (event.target === modal) closeConcept(); });
+document.addEventListener("keydown", event => { if (event.key === "Escape" && !modal.hidden) closeConcept(); });
 
-/* ===== Pemutar otomatis & log ===== */
-function player(stepFn, btn) {
-  let timer = null;
-  const stop = () => {
-    clearInterval(timer);
-    timer = null;
-    btn.textContent = "Putar ▶";
-  };
-  btn.addEventListener("click", () => {
-    if (timer) return stop();
-    btn.textContent = "Jeda ⏸";
-    timer = setInterval(() => { if (!stepFn()) stop(); }, 550);
-  });
-  return stop;
+// Toast utility
+let toastTimer;
+function toast(message) {
+  const el = $("#toast");
+  el.textContent = message;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 2200);
 }
-
-function log(id, msg, cls = "") {
-  const box = $("#" + id);
-  box.querySelector(".muted")?.remove();
+function timeStamp() {
+  return new Date().toLocaleTimeString("id-ID", { hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit" });
+}
+function appendLog(target, message, type = "") {
+  const container = $(target);
   const p = document.createElement("p");
-  p.className = cls;
   const time = document.createElement("span");
-  time.className = "t";
-  time.textContent = `[${new Date().toLocaleTimeString("id-ID", { hour12: false })}]`;
-  p.append(time, msg);
-  box.append(p);
-  box.scrollTop = box.scrollHeight;
+  time.className = "log-time";
+  time.textContent = `[${timeStamp()}]`;
+  p.append(time, document.createTextNode(message));
+  if (type) p.classList.add(type);
+  container.appendChild(p);
+  container.scrollTop = container.scrollHeight;
+}
+function clearLog(target, placeholder) {
+  $(target).replaceChildren();
+  const p = document.createElement("p");
+  p.className = "log-muted";
+  p.textContent = placeholder;
+  $(target).appendChild(p);
+}
+function clearPlaceholder(target) {
+  const log = $(target);
+  if (log.querySelector(".log-muted")) log.replaceChildren();
 }
 
-/* ===== Bubble Sort ===== */
-let sItems = [], sGen = null, sMax = 1, sCmp = 0, sSwap = 0, sPass = 0;
-const stopSort = player(sortStep, $("#sortPlay"));
-
-function* bubbleSteps(list, asc) {
-  const arr = [...list];
-  const n = arr.length;
-  for (let p = 0; p < n - 1; p++) {
-    let swapped = false;
-    for (let j = 0; j < n - p - 1; j++) {
-      const a = arr[j], b = arr[j + 1];
-      const need = asc ? a.value > b.value : a.value < b.value;
-      yield { t: "cmp", j, a, b, need, arr: [...arr] };
-      if (need) {
-        [arr[j], arr[j + 1]] = [b, a];
-        swapped = true;
-        yield { t: "swap", j, a, b, arr: [...arr] };
-      }
-    }
-    yield { t: "pass", p, sorted: n - p - 1, arr: [...arr] };
-    if (!swapped) break;
-  }
-  yield { t: "done", arr: [...arr] };
+// Sorting — Bubble Sort, one comparison per step
+let sortState = {};
+function getSortSource() {
+  const key = $("#sortDataset").value;
+  return mountains.map((m, i) => ({
+    ...m, originalIndex: i,
+    value: key === "height" ? m.height : m.price,
+    label: key === "height" ? `${m.height} m` : `Rp${m.price.toLocaleString("id-ID")}`
+  }));
 }
-
-function renderSort(arr, hl = [], sortedFrom = arr.length) {
-  arr.forEach((it, pos) => {
-    const el = it.el;
-    el.style.left = `calc(${(pos / arr.length) * 100}% + 6px)`;
-    el.style.width = `calc(${100 / arr.length}% - 12px)`;
-    el.style.height = `${Math.max(64, (it.value / sMax) * 200)}px`;
-    el.firstElementChild.textContent = `[${pos}]`;
-    el.classList.toggle("hl", hl.includes(pos));
-    el.classList.toggle("done", pos >= sortedFrom);
+function resetSort() {
+  sortState = {
+    data: getSortSource(), i: 0, j: 0, comparisons: 0, swaps: 0,
+    done: false, started: false, step: 0, swappedThisPass: false
+  };
+  $("#sortStart").disabled = false;
+  $("#sortNext").disabled = true;
+  $("#compareCount").textContent = "0";
+  $("#swapCount").textContent = "0";
+  $("#stepCount").textContent = "0";
+  $("#sortStatus").textContent = "Siap";
+  clearLog("#sortLog", "/* Tekan “Mulai sorting” untuk memulai simulasi. */");
+  renderSort();
+}
+function renderSort(active = [], swapped = []) {
+  const visual = $("#sortVisual");
+  visual.replaceChildren();
+  const max = Math.max(...sortState.data.map(d => d.value), 1);
+  sortState.data.forEach((item, index) => {
+    const box = document.createElement("div");
+    box.className = "sort-item";
+    if (active.includes(index)) box.classList.add("comparing");
+    if (swapped.includes(index)) box.classList.add("swapped");
+    if (sortState.done) box.classList.add("sorted");
+    const bar = document.createElement("div");
+    bar.className = "sort-bar";
+    bar.style.height = `${Math.max(24, 132 * item.value / max)}px`;
+    bar.textContent = item.value.toLocaleString("id-ID");
+    const value = document.createElement("span");
+    value.className = "sort-value";
+    value.textContent = item.name;
+    const idx = document.createElement("small");
+    idx.textContent = `indeks ${index}`;
+    box.append(bar, value, idx);
+    visual.appendChild(box);
   });
 }
-
-function sortStats() {
-  $("#sortCmp").textContent = sCmp;
-  $("#sortSwap").textContent = sSwap;
-  $("#sortPass").textContent = sPass;
-}
-
-function sortSetup() {
-  stopSort();
-  const byHeight = $("#sortDataset").value === "height";
-  sItems = MOUNTAINS.map((m) => ({ name: m.name, value: byHeight ? m.height : m.price }));
-  sMax = Math.max(...sItems.map((it) => it.value));
-  sGen = null;
-  sCmp = sSwap = sPass = 0;
-  $("#sortStage").replaceChildren(...sItems.map((it) => {
-    it.el = document.createElement("div");
-    it.el.className = "bar";
-    it.el.innerHTML = `<small></small><span class="val">${fmt(it.value)}</span><span class="nm">${it.name}</span>`;
-    return it.el;
-  }));
-  renderSort(sItems);
-  sortStats();
-  $("#sortNext").disabled = true;
-  $("#sortPlay").disabled = true;
-  $("#sortStatus").textContent = "Siap";
-  $("#sortLog").innerHTML = '<p class="muted">Tekan “Mulai sorting” untuk memulai.</p>';
-}
-
-function sortStart() {
-  sortSetup();
-  const asc = $("#sortOrder").value === "asc";
-  sGen = bubbleSteps(sItems, asc);
+function startSort() {
+  resetSort();
+  sortState.started = true;
+  $("#sortStart").disabled = true;
   $("#sortNext").disabled = false;
-  $("#sortPlay").disabled = false;
   $("#sortStatus").textContent = "Berjalan";
-  log("sortLog", `Mulai Bubble Sort (${asc ? "kecil ke besar" : "besar ke kecil"}). Data awal: [${sItems.map((x) => fmt(x.value)).join(", ")}]`);
+  const order = $("#sortOrder").value === "asc" ? "menaik" : "menurun";
+  appendLog("#sortLog", `Memulai Bubble Sort berdasarkan ${$("#sortDataset").value === "height" ? "ketinggian" : "harga tiket simulasi"} (${order}).`);
+  appendLog("#sortLog", `Data awal: [${sortState.data.map(d => d.value).join(", ")}]`);
+  renderSort();
 }
-
-function sortStep() {
-  const r = sGen?.next();
-  if (!r || r.done) return false;
-  const s = r.value;
-  if (s.t === "cmp") {
-    sCmp++;
-    renderSort(s.arr, [s.j, s.j + 1]);
-    log("sortLog", `Bandingkan ${s.a.name} (${fmt(s.a.value)}) dan ${s.b.name} (${fmt(s.b.value)}): ${s.need ? "perlu ditukar" : "sudah sesuai"}.`);
-  } else if (s.t === "swap") {
-    sSwap++;
-    renderSort(s.arr, [s.j, s.j + 1]);
-    log("sortLog", `Tukar posisi ${s.j} dan ${s.j + 1}.`, "ok");
-  } else if (s.t === "pass") {
-    sPass++;
-    renderSort(s.arr, [], s.sorted);
-    log("sortLog", `Pass ${sPass} selesai. Posisi ${s.sorted} sampai akhir sudah terurut.`);
-  } else {
-    renderSort(s.arr, [], 0);
-    log("sortLog", `Selesai! Hasil: [${s.arr.map((x) => fmt(x.value)).join(", ")}]`, "ok");
-    $("#sortStatus").textContent = "Selesai";
-    $("#sortNext").disabled = true;
-    $("#sortPlay").disabled = true;
-    stopSort();
-    sortStats();
-    return false;
-  }
-  sortStats();
-  return true;
-}
-
-/* ===== Linear Search ===== */
-let qGen = null, qChecked = 0;
-const stopSearch = player(searchStep, $("#searchPlay"));
-
-function* linearSteps(list, key, field) {
-  for (let i = 0; i < list.length; i++) {
-    const m = list[i];
-    const hit = field === "name"
-      ? m.name.toLowerCase().includes(key.toLowerCase())
-      : m.height === Number(key.replace(/\D/g, ""));
-    yield { t: "check", i, m, hit };
-    if (hit) return;
-  }
-  yield { t: "miss" };
-}
-
-function searchSetup() {
-  stopSearch();
-  qGen = null;
-  qChecked = 0;
-  $("#searchGrid").replaceChildren(...MOUNTAINS.map((m, i) => {
-    const el = document.createElement("div");
-    el.className = "s-item";
-    el.innerHTML = `<small>INDEKS ${i}</small><strong>${m.name}</strong><span>${fmt(m.height)} mdpl</span>`;
-    return el;
-  }));
-  $("#searchChecked").textContent = "0";
-  $("#searchActive").textContent = "—";
-  $("#searchResult").textContent = "—";
-  $("#searchStatus").textContent = "Siap";
-  $("#searchNext").disabled = true;
-  $("#searchPlay").disabled = true;
-  $("#searchLog").innerHTML = '<p class="muted">Masukkan kata kunci, lalu tekan “Cari data”.</p>';
-}
-
-function searchStart() {
-  const key = $("#searchKey").value.trim();
-  if (!key) {
-    toast("Masukkan kata kunci terlebih dahulu.");
-    $("#searchKey").focus();
+function nextSortStep() {
+  if (!sortState.started || sortState.done) return;
+  const arr = sortState.data;
+  const n = arr.length;
+  if (sortState.i >= n - 1) {
+    finishSort();
     return;
   }
-  searchSetup();
-  qGen = linearSteps(MOUNTAINS, key, $("#searchField").value);
-  $("#searchNext").disabled = false;
-  $("#searchPlay").disabled = false;
-  $("#searchStatus").textContent = "Berjalan";
-  log("searchLog", `Mulai Linear Search untuk "${key}".`);
-}
-
-function searchStep() {
-  const r = qGen?.next();
-  if (!r || r.done) return false;
-  const s = r.value;
-  const cells = [...$("#searchGrid").children];
-  if (s.t === "check") {
-    qChecked++;
-    cells.forEach((c, k) => (c.className = "s-item" + (k === s.i ? " active" : k < s.i ? " checked" : "")));
-    $("#searchChecked").textContent = qChecked;
-    $("#searchActive").textContent = s.i;
-    if (!s.hit) {
-      log("searchLog", `Indeks ${s.i}: ${s.m.name} tidak cocok, lanjut ke elemen berikutnya.`);
-      return true;
+  if (sortState.j >= n - sortState.i - 1) {
+    if (!sortState.swappedThisPass) {
+      sortState.done = true;
+      finishSort();
+      return;
     }
-    cells[s.i].className = "s-item found";
-    $("#searchResult").textContent = `Indeks ${s.i}`;
-    $("#searchStatus").textContent = "Ditemukan";
-    log("searchLog", `Data "${s.m.name}" ditemukan pada indeks ${s.i}.`, "ok");
-  } else {
-    $("#searchResult").textContent = "Tidak ada";
-    $("#searchStatus").textContent = "Tidak ditemukan";
-    log("searchLog", "Seluruh elemen sudah diperiksa, data tidak ditemukan.", "err");
+    sortState.i++;
+    sortState.j = 0;
+    sortState.swappedThisPass = false;
+    if (sortState.i >= n - 1) { finishSort(); return; }
   }
-  $("#searchNext").disabled = true;
-  $("#searchPlay").disabled = true;
-  stopSearch();
-  return false;
+  const j = sortState.j;
+  const a = arr[j], b = arr[j + 1];
+  const ascending = $("#sortOrder").value === "asc";
+  sortState.comparisons++;
+  sortState.step++;
+  clearPlaceholder("#sortLog");
+  appendLog("#sortLog", `Langkah ${sortState.step}: membandingkan ${a.name} (${a.value.toLocaleString("id-ID")}) dan ${b.name} (${b.value.toLocaleString("id-ID")}).`);
+  const shouldSwap = ascending ? a.value > b.value : a.value < b.value;
+  let swapped = [];
+  if (shouldSwap) {
+    arr[j] = b; arr[j + 1] = a;
+    sortState.swaps++;
+    sortState.swappedThisPass = true;
+    swapped = [j, j + 1];
+    appendLog("#sortLog", `${a.value} ${ascending ? "lebih besar" : "lebih kecil"} dari ${b.value}; tukar kedua elemen.`, "log-success");
+    appendLog("#sortLog", `Array sekarang: [${arr.map(d => d.value).join(", ")}]`);
+  } else {
+    appendLog("#sortLog", "Urutan pasangan sudah sesuai; tidak perlu pertukaran.");
+  }
+  sortState.j++;
+  $("#compareCount").textContent = sortState.comparisons;
+  $("#swapCount").textContent = sortState.swaps;
+  $("#stepCount").textContent = sortState.step;
+  renderSort(shouldSwap ? [] : [j, j + 1], swapped);
+  if (sortState.i >= n - 1 || (sortState.j >= n - sortState.i - 1 && !sortState.swappedThisPass)) {
+    // Keep final result available for a separate completion message on next click.
+    $("#sortStatus").textContent = "Memproses";
+  }
+  if (sortState.j >= n - sortState.i - 1 && sortState.swappedThisPass && sortState.i + 1 >= n - 1) {
+    finishSort();
+  }
 }
+function finishSort() {
+  if (sortState.done) return;
+  sortState.done = true;
+  sortState.started = false;
+  $("#sortNext").disabled = true;
+  $("#sortStart").disabled = false;
+  $("#sortStatus").textContent = "Selesai";
+  appendLog("#sortLog", `Sorting selesai. Hasil: [${sortState.data.map(d => d.value).join(", ")}].`, "log-success");
+  appendLog("#sortLog", `Total ${sortState.comparisons} perbandingan dan ${sortState.swaps} pertukaran.`);
+  renderSort();
+}
+$("#sortStart").addEventListener("click", startSort);
+$("#sortNext").addEventListener("click", nextSortStep);
+$("#sortReset").addEventListener("click", resetSort);
+$("#sortDataset").addEventListener("change", resetSort);
+$("#sortOrder").addEventListener("change", resetSort);
+$("#clearSortLog").addEventListener("click", () => clearLog("#sortLog", "/* Log dikosongkan. Jalankan atau lanjutkan sorting. */"));
+resetSort();
 
-/* ===== Event & inisialisasi ===== */
-$("#sortStart").addEventListener("click", sortStart);
-$("#sortNext").addEventListener("click", sortStep);
-$("#sortReset").addEventListener("click", sortSetup);
-$("#sortDataset").addEventListener("change", sortSetup);
-$("#sortOrder").addEventListener("change", sortSetup);
-$("#searchStart").addEventListener("click", searchStart);
-$("#searchNext").addEventListener("click", searchStep);
-$("#searchReset").addEventListener("click", searchSetup);
-$("#searchKey").addEventListener("keydown", (e) => { if (e.key === "Enter") searchStart(); });
+// Searching — Linear Search, one element per step
+let searchState = {};
+function resetSearch(keepInput = true) {
+  searchState = { data: mountains.map((m, i) => ({ ...m, originalIndex: i })), key: "", field: "name", index: 0, checked: 0, found: -1, started: false, done: false };
+  $("#searchNext").disabled = true;
+  $("#checkedCount").textContent = "0";
+  $("#activeIndex").textContent = "—";
+  $("#searchResult").textContent = "—";
+  $("#searchStatus").textContent = "Siap";
+  clearLog("#searchLog", "/* Masukkan kata kunci, lalu tekan “Cari data”. */");
+  renderSearch();
+}
+function renderSearch(active = -1, found = -1) {
+  const visual = $("#searchVisual");
+  visual.replaceChildren();
+  searchState.data.forEach((item, i) => {
+    const box = document.createElement("div");
+    box.className = "search-item";
+    if (i === active) box.classList.add("active");
+    if (i === found) box.classList.add("found");
+    const idx = document.createElement("small"); idx.textContent = `INDEX ${i}`;
+    const name = document.createElement("strong"); name.textContent = item.name;
+    const detail = document.createElement("span"); detail.textContent = `${item.height.toLocaleString("id-ID")} mdpl`;
+    box.append(idx, name, detail); visual.appendChild(box);
+  });
+}
+function startSearch() {
+  const key = $("#searchKey").value.trim();
+  if (!key) { toast("Masukkan kata kunci terlebih dahulu."); $("#searchKey").focus(); return; }
+  searchState = { data: mountains.map((m, i) => ({ ...m, originalIndex: i })), key, field: $("#searchField").value, index: 0, checked: 0, found: -1, started: true, done: false };
+  $("#searchNext").disabled = false;
+  $("#checkedCount").textContent = "0"; $("#activeIndex").textContent = "—"; $("#searchResult").textContent = "—"; $("#searchStatus").textContent = "Berjalan";
+  clearLog("#searchLog", "");
+  appendLog("#searchLog", `Memulai Linear Search. Kata kunci: "${key}".`);
+  appendLog("#searchLog", `Kriteria: ${searchState.field === "name" ? "nama gunung" : "ketinggian"}.`);
+  renderSearch();
+  nextSearchStep();
+}
+function nextSearchStep() {
+  if (!searchState.started || searchState.done) return;
+  clearPlaceholder("#searchLog");
+  if (searchState.index >= searchState.data.length) {
+    searchState.done = true; searchState.started = false;
+    $("#searchNext").disabled = true; $("#searchStatus").textContent = "Tidak ditemukan";
+    $("#searchResult").textContent = "Tidak ada";
+    appendLog("#searchLog", `Seluruh ${searchState.data.length} elemen telah diperiksa. Data tidak ditemukan.`, "log-error");
+    renderSearch(); return;
+  }
+  const i = searchState.index;
+  const item = searchState.data[i];
+  const matches = searchState.field === "name"
+    ? item.name.toLocaleLowerCase("id-ID").includes(searchState.key.toLocaleLowerCase("id-ID"))
+    : String(item.height) === searchState.key.replace(/[.,\s]/g, "");
+  searchState.checked++;
+  $("#checkedCount").textContent = searchState.checked;
+  $("#activeIndex").textContent = i;
+  appendLog("#searchLog", `Memeriksa indeks ${i}: ${item.name} (${searchState.field === "name" ? item.name : item.height}).`);
+  if (matches) {
+    searchState.found = i; searchState.done = true; searchState.started = false;
+    $("#searchNext").disabled = true; $("#searchStatus").textContent = "Ditemukan";
+    $("#searchResult").textContent = `Indeks ${i}`;
+    appendLog("#searchLog", `Data "${item.name}" ditemukan pada indeks ${i}.`, "log-success");
+    renderSearch(-1, i);
+  } else {
+    appendLog("#searchLog", "Data tidak cocok; lanjut ke elemen berikutnya.");
+    searchState.index++;
+    renderSearch(i, -1);
+    if (searchState.index >= searchState.data.length) {
+      searchState.done = true; searchState.started = false;
+      $("#searchNext").disabled = true; $("#searchStatus").textContent = "Tidak ditemukan";
+      $("#searchResult").textContent = "Tidak ada";
+      appendLog("#searchLog", `Seluruh ${searchState.data.length} elemen telah diperiksa. Data tidak ditemukan.`, "log-error");
+    }
+  }
+}
+$("#searchStart").addEventListener("click", startSearch);
+$("#searchNext").addEventListener("click", nextSearchStep);
+$("#searchReset").addEventListener("click", () => resetSearch());
+$("#clearSearchLog").addEventListener("click", () => clearLog("#searchLog", "/* Log dikosongkan. Jalankan pencarian untuk membuat log baru. */"));
+$("#searchKey").addEventListener("keydown", e => { if (e.key === "Enter") startSearch(); });
+resetSearch();
 
-sortSetup(); 
-searchSetup();})
+// Algorithm tabs
+$$(".algo-tab").forEach(tab => tab.addEventListener("click", () => {
+  $$(".algo-tab").forEach(t => t.classList.toggle("active", t === tab));
+  $$(".algorithm-workspace").forEach(panel => panel.classList.toggle("hidden", panel.id !== tab.dataset.tab));
+  if (tab.dataset.tab === "searchPanel") {
+    $("#searching").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+  }
+}));
+
+// Ensure the Searching navbar link activates its workspace before scrolling to it.
+const searchingNav = document.querySelector('.nav-link[href="#searching"]');
+searchingNav.addEventListener("click", event => {
+  event.preventDefault();
+  const tab = document.querySelector('.algo-tab[data-tab="searchPanel"]');
+  if (tab) tab.click();
+  history.replaceState(null, "", "#searching");
+  setTimeout(() => $("#searching").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" }), 80);
+});
