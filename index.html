@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="author" content="Muhammad Azizul Hakim" />
+  <meta name="description" content="MOUNTAZ — platform pembelajaran Struktur Data dengan tema petualangan gunung." />
+  <meta name="theme-color" content="#142d25" />
+  <title>MOUNTAZ — Struktur Data | Muhammad Azizul Hakim (25050974120)</title>
+  <script>
+    // Terapkan tema sebelum halaman tampil agar tidak ada kedipan
+    (function () {
+      var saved = null;
+      try { saved = localStorage.getItem("mountaz-theme"); } catch (e) {}
+      document.documentElement.dataset.theme = saved || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Lewati ke konten</a>
+  <div class="progress" id="progress"></div>
+  <div class="loader" id="loader"><div class="loader-mark">M<span>↗</span></div></div>
+
+  <header class="navbar" id="navbar">
+    <a class="brand" href="#home" aria-label="MOUNTAZ beranda">
+      <svg viewBox="0 0 42 34" aria-hidden="true"><path d="M2 30 15 8l7 11 5-8 13 19H2Z" /></svg>
+      <span>MOUNT<span class="accent">AZ</span></span>
+    </a>
+    <nav class="nav-links" id="navLinks" aria-label="Navigasi utama">
+      <a class="nav-link" href="#home">Beranda</a>
+      <a class="nav-link" href="#materi">Materi</a>
+      <a class="nav-link" href="#sorting">Sorting</a>
+      <a class="nav-link" href="#searching">Searching</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeToggle" aria-label="Ganti mode gelap/terang">
+        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>
+        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" /><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" /></svg>
+      </button>
+      <button class="menu-toggle" id="menuToggle" aria-label="Buka menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span></button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="home">
+      <div class="hero-bg"></div>
+      <div class="hero-content">
+        <p class="eyebrow fade-up">LEARN • EXPLORE • DISCOVER</p>
+        <h1 class="fade-up d1">Explore beyond<br />the <em>ordinary.</em></h1>
+        <p class="lead fade-up d2">Petualangan baru dimulai dari rasa ingin tahu. Jelajahi konsep Struktur Data lewat visualisasi yang bisa kamu jalankan langsung.</p>
+        <div class="hero-actions fade-up d3">
+          <a class="btn btn-light" href="#materi">Jelajahi materi ↗</a>
+          <a class="btn btn-ghost" href="#sorting">▶ Lihat simulasi</a>
+        </div>
+      </div>
+      <a class="scroll-cue" href="#intro" aria-label="Gulir ke bawah"></a>
+    </section>
+
+    <section class="section reveal" id="intro">
+      <p class="kicker"><span>01</span> THE JOURNEY BEGINS</p>
+      <div class="intro-grid">
+        <h2>Setiap perjalanan dimulai dari <em>dasar.</em></h2>
+        <p>Struktur data membantu kita mengatur, menyimpan, dan menemukan informasi dengan lebih efisien. Di MOUNTAZ, kamu mempelajarinya lewat visualisasi sederhana bertema petualangan.</p>
+      </div>
+      <div class="stats">
+        <div><strong data-count="3">3</strong><span>Konsep utama</span></div>
+        <div><strong data-count="2">2</strong><span>Algoritma interaktif</span></div>
+        <div><strong>∞</strong><span>Ruang untuk belajar</span></div>
+      </div>
+    </section>
+
+    <section class="section reveal" id="materi">
+      <div class="section-head">
+        <div>
+          <p class="kicker"><span>02</span> KNOW YOUR TOOLS</p>
+          <h2>Explore the <em>structure.</em></h2>
+        </div>
+        <p>Kenali fondasi penting sebelum melangkah lebih jauh. Klik kartu untuk membaca penjelasan dan contoh kodenya.</p>
+      </div>
+      <div class="cards">
+        <button class="card" data-concept="array">
+          <span class="card-top"><small>01 / CONCEPT</small><i>▦</i></span>
+          <span class="art"><span class="box">12</span><span class="box">24</span><span class="box hot">36</span><span class="box">48</span></span>
+          <span class="card-title">Array <span class="arrow">↗</span></span>
+          <span class="card-text">Simpan banyak nilai dalam satu struktur yang tersusun berdasarkan indeks.</span>
+        </button>
+        <button class="card" data-concept="pointer">
+          <span class="card-top"><small>02 / CONCEPT</small><i>⌁</i></span>
+          <span class="art"><span class="box">ptr<small>0x01</small></span><span class="ptr-arrow">⟶</span><span class="box hot">42</span></span>
+          <span class="card-title">Pointer <span class="arrow">↗</span></span>
+          <span class="card-text">Pahami bagaimana pointer menyimpan alamat dan menunjuk ke sebuah nilai.</span>
+        </button>
+        <button class="card" data-concept="struct">
+          <span class="card-top"><small>03 / CONCEPT</small><i>{ }</i></span>
+          <span class="art col"><span>nama <b>"Prau"</b></span><span>tinggi <b>2.565</b></span><span>lokasi <b>"Jateng"</b></span></span>
+          <span class="card-title">Struct <span class="arrow">↗</span></span>
+          <span class="card-text">Gabungkan beberapa data berbeda menjadi satu tipe data bentukan.</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="section play" id="sorting">
+      <p class="kicker"><span>03</span> ALGORITHM IN ACTION</p>
+      <div class="section-head">
+        <h2>Make order out of <em>chaos.</em></h2>
+        <p>Amati bagaimana data berpindah dan dibandingkan. Jalankan langkah demi langkah atau biarkan berputar otomatis.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><span class="live"></span><span class="lbl">LIVE PLAYGROUND</span><h3>Bubble Sort</h3></div>
+          <span class="badge">O(n²)</span>
+        </div>
+        <p class="desc">Urutkan ketinggian gunung dari yang terendah ke tertinggi. Setiap langkah membandingkan dua elemen yang bersebelahan.</p>
+        <div class="controls">
+          <label>Data <select id="sortDataset"><option value="height">Ketinggian gunung</option><option value="price">Harga tiket (simulasi)</option></select></label>
+          <label>Urutan <select id="sortOrder"><option value="asc">Kecil ke besar</option><option value="desc">Besar ke kecil</option></select></label>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="sortStart">Mulai sorting</button>
+            <button class="btn btn-outline" id="sortNext" disabled>Langkah berikutnya ↗</button>
+            <button class="btn btn-outline" id="sortPlay" disabled>Putar ▶</button>
+            <button class="icon-btn" id="sortReset" aria-label="Reset sorting">↺</button>
+          </div>
+        </div>
+        <div class="stage" id="sortStage" role="img" aria-label="Visualisasi Bubble Sort"></div>
+        <div class="stats-mini">
+          <div><span>PERBANDINGAN</span><strong id="sortCmp">0</strong></div>
+          <div><span>PERTUKARAN</span><strong id="sortSwap">0</strong></div>
+          <div><span>PASS</span><strong id="sortPass">0</strong></div>
+          <div><span>STATUS</span><strong class="status" id="sortStatus">Siap</strong></div>
+        </div>
+        <div class="log" id="sortLog" aria-live="polite"></div>
+        <details class="code">
+          <summary>Lihat contoh kode C++</summary>
+          <pre>void bubbleSort(int arr[], int n) {
+    for (int i = 0; i &lt; n - 1; i++) {
+        for (int j = 0; j &lt; n - i - 1; j++) {
+            if (arr[j] &gt; arr[j + 1]) {
+                swap(arr[j], arr[j + 1]);
+            }
+        }
+    }
+}</pre>
+        </details>
+      </div>
+    </section>
+
+    <section class="section play" id="searching">
+      <p class="kicker"><span>04</span> FIND THE PEAK</p>
+      <div class="section-head">
+        <h2>Cari satu <em>puncak.</em></h2>
+        <p>Linear Search memeriksa elemen satu per satu dari awal sampai data ditemukan atau daftar habis.</p>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><span class="live"></span><span class="lbl">LIVE PLAYGROUND</span><h3>Linear Search</h3></div>
+          <span class="badge">O(n)</span>
+        </div>
+        <p class="desc">Cari gunung berdasarkan nama atau ketinggian. Coba kata kunci Prau, atau 3726 untuk Rinjani.</p>
+        <div class="controls">
+          <label class="grow">Kata kunci <input id="searchKey" type="text" value="Prau" placeholder="Contoh: Prau atau 3726" autocomplete="off" /></label>
+          <label>Cari berdasarkan <select id="searchField"><option value="name">Nama gunung</option><option value="height">Ketinggian</option></select></label>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="searchStart">Cari data ↗</button>
+            <button class="btn btn-outline" id="searchNext" disabled>Langkah berikutnya</button>
+            <button class="btn btn-outline" id="searchPlay" disabled>Putar ▶</button>
+            <button class="icon-btn" id="searchReset" aria-label="Reset pencarian">↺</button>
+          </div>
+        </div>
+        <div class="grid" id="searchGrid"></div>
+        <div class="stats-mini">
+          <div><span>DIPERIKSA</span><strong id="searchChecked">0</strong></div>
+          <div><span>INDEKS AKTIF</span><strong id="searchActive">—</strong></div>
+          <div><span>HASIL</span><strong id="searchResult">—</strong></div>
+          <div><span>STATUS</span><strong class="status" id="searchStatus">Siap</strong></div>
+        </div>
+        <div class="log" id="searchLog" aria-live="polite"></div>
+        <details class="code">
+          <summary>Lihat contoh kode C++</summary>
+          <pre>int linearSearch(int arr[], int n, int target) {
+    for (int i = 0; i &lt; n; i++) {
+        if (arr[i] == target) {
+            return i;
+        }
+    }
+    return -1;
+}</pre>
+        </details>
+      </div>
+    </section>
+
+    <section class="section closing reveal">
+      <h2>Knowledge is <em>your compass.</em></h2>
+      <p>Terus bereksperimen, amati setiap langkah, dan temukan cara baru untuk memahami data.</p>
+      <a class="btn btn-primary" href="#home">Kembali ke atas ↑</a>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a class="brand" href="#home"><span>MOUNT<span class="accent">AZ</span></span></a>
+    <div class="credit">
+      <strong>Muhammad Azizul Hakim</strong>
+      <span>NIM 25050974120 · Tugas Struktur Data</span>
+    </div>
+    <span>© 2026 MOUNTAZ</span>
+  </footer>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" aria-label="Tutup">×</button>
+      <p class="kicker">MOUNTAZ FIELD GUIDE</p>
+      <h2 id="modalTitle"></h2>
+      <p class="m-desc" id="modalDesc"></p>
+      <div class="modal-example" id="modalExample"></div>
+      <div class="code-box"><div class="code-title">C++ EXAMPLE</div><pre id="modalCode"></pre></div>
+      <button class="btn btn-primary" id="modalDone">Mengerti ✓</button>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>
