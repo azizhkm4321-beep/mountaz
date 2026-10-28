@@ -1,0 +1,351 @@
+/* ==========================================================================
+   ALPINE EXPEDITION GLASS DESIGN SYSTEM (LIGHT & DARK MODE)
+   Theme: Modern Nature-Inspired Utility with Tactile Glassmorphism
+   Colors, Typography & Elevation Specifications
+   ========================================================================== */
+
+:root {
+  /* Surface & Canvas Tokens (Light Mode - Alpine Mist) */
+  --surface: #f9f9ff;
+  --surface-dim: #d3daef;
+  --surface-bright: #f9f9ff;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f1f3ff;
+  --surface-container: #e9edff;
+  --surface-container-high: #e1e8fd;
+  --surface-container-highest: #dce2f7;
+  --surface-variant: #dce2f7;
+  --surface-mist: #F4F7F5;
+  --surface-mist2: #EAEFEA;
+
+  /* Text & On-Surface Tokens */
+  --on-surface: #141b2b;
+  --on-surface-variant: #404945;
+  --inverse-surface: #293040;
+  --inverse-on-surface: #edf0ff;
+
+  /* Primary Tokens (Deep Forest Emerald) */
+  --primary: #003629;
+  --primary-forest: #1B4D3E;
+  --primary-container: #1b4d3e;
+  --on-primary: #ffffff;
+  --on-primary-container: #8abda9;
+  --inverse-primary: #9ed1bd;
+  --primary-fixed: #baeed9;
+  --primary-fixed-dim: #9ed1bd;
+  --on-primary-fixed: #002117;
+  --on-primary-fixed-variant: #1d4f40;
+
+  /* Secondary Tokens (Adventure Vermilion) */
+  --secondary: #aa3600;
+  --secondary-vermilion: #E65F2B;
+  --secondary-container: #fd703b;
+  --on-secondary: #ffffff;
+  --on-secondary-container: #601b00;
+  --secondary-fixed: #ffdbcf;
+  --secondary-fixed-dim: #ffb59c;
+  --on-secondary-fixed: #390c00;
+  --on-secondary-fixed-variant: #822700;
+
+  /* Tertiary Tokens (Alpine Amber) */
+  --tertiary: #442800;
+  --tertiary-amber: #F59E0B;
+  --tertiary-container: #623c00;
+  --on-tertiary: #ffffff;
+  --on-tertiary-container: #f69f0d;
+  --tertiary-fixed: #ffddb8;
+  --tertiary-fixed-dim: #ffb95f;
+  --on-tertiary-fixed: #2a1700;
+  --on-tertiary-fixed-variant: #653e00;
+
+  /* Neutral & Outline */
+  --outline: #707974;
+  --outline-variant: #c0c9c3;
+  --surface-tint: #376757;
+  --neutral-slate: #111827;
+
+  /* Ticket & Glass Components */
+  --glass-bg: rgba(255, 255, 255, 0.74);
+  --glass-border: rgba(255, 255, 255, 0.55);
+  --ticket-bg: #ffffff;
+  --ticket-top-bg: linear-gradient(135deg, #ffffff 0%, #f1f3ff 100%);
+  --ticket-bottom-bg: #ffffff;
+  --ticket-notch-bg: #F4F7F5;
+  --ticket-border: #dce2f7;
+
+  /* Radii */
+  --rounded-sm: 0.25rem;
+  --rounded-default: 0.5rem;
+  --rounded-md: 0.75rem;
+  --rounded-lg: 1rem;
+  --rounded-xl: 1.5rem;
+  --rounded-full: 9999px;
+
+  /* Shadows */
+  --shadow-card: 0 4px 20px -2px rgba(15, 56, 43, 0.06);
+  --shadow-raised: 0 12px 32px -4px rgba(17, 24, 39, 0.12), 0 2px 6px rgba(15, 56, 43, 0.04);
+  --shadow-glow: 0 0 16px rgba(230, 95, 43, 0.35);
+
+  /* Fonts */
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Dark Mode Tokens (High-Altitude Montane Night) */
+html.dark {
+  --surface-mist: #08110d;
+  --surface-mist2: #0e1b15;
+  --surface-container-lowest: #0e1a14;
+  --surface-container-low: #11221b;
+  --surface-container: #142720;
+  --surface-variant: rgba(158, 209, 189, 0.18);
+  
+  --on-surface: #edf0ff;
+  --on-surface-variant: #8abda9;
+
+  --primary: #edf0ff;
+  --primary-forest: #1b4d3e;
+  --primary-fixed: #baeed9;
+  --primary-fixed-dim: #9ed1bd;
+
+  --secondary: #ffb59c;
+  --secondary-vermilion: #E65F2B;
+  --secondary-fixed: #ffdbcf;
+
+  --tertiary: #ffb95f;
+  --tertiary-amber: #f69f0d;
+
+  --glass-bg: rgba(14, 27, 21, 0.84);
+  --glass-border: rgba(158, 209, 189, 0.18);
+  
+  /* Ticket Dark Palette */
+  --ticket-bg: #0b1510;
+  --ticket-top-bg: linear-gradient(135deg, #0e2017 0%, #07120d 100%);
+  --ticket-bottom-bg: #050d09;
+  --ticket-notch-bg: #08110d;
+  --ticket-border: rgba(158, 209, 189, 0.2);
+  --neutral-slate: #050b08;
+
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--surface-mist);
+  color: var(--on-surface);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Glassmorphism Styles */
+.alpine-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-card);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.alpine-glass-dark {
+  background: rgba(11, 20, 16, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(158, 209, 189, 0.18);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.5);
+}
+
+/* Bi-Fold Boarding Pass with Perforated Notch Cut-outs */
+.bifold-ticket {
+  position: relative;
+  background: var(--ticket-bg);
+  border: 1px solid var(--ticket-border);
+  border-radius: var(--rounded-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.bifold-ticket:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-raised);
+}
+
+.ticket-divider-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 24px;
+}
+
+.ticket-notch-left,
+.ticket-notch-right {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: var(--ticket-notch-bg);
+  border-radius: var(--rounded-full);
+  z-index: 10;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.ticket-notch-left {
+  left: -10px;
+  border-right: 1px solid var(--ticket-border);
+}
+
+.ticket-notch-right {
+  right: -10px;
+  border-left: 1px solid var(--ticket-border);
+}
+
+.ticket-perforation {
+  width: 100%;
+  height: 1px;
+  border-top: 2px dashed rgba(158, 209, 189, 0.35);
+}
+
+/* Explicit Dark Mode Overrides for Bi-Fold Ticket */
+html.dark .bifold-ticket {
+  background: #0b1510 !important;
+  border-color: rgba(158, 209, 189, 0.2) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45) !important;
+}
+
+html.dark .bifold-ticket .bg-gradient-to-br,
+html.dark .ticket-top-segment {
+  background-color: #0e2017 !important;
+  background-image: linear-gradient(135deg, #0e2017 0%, #07120d 100%) !important;
+  border-bottom-color: rgba(158, 209, 189, 0.16) !important;
+  color: #edf0ff !important;
+}
+
+html.dark .bifold-ticket .bg-surface-lowest,
+html.dark .ticket-bottom-segment {
+  background-color: #050d09 !important;
+  background-image: none !important;
+  color: #edf0ff !important;
+}
+
+html.dark .ticket-notch-left,
+html.dark .ticket-notch-right {
+  background-color: #08110d !important;
+  border-color: rgba(158, 209, 189, 0.2) !important;
+}
+
+/* Explicit Dark Mode Override for Laboratorium Komputasi Ekspedisi (#lab) */
+html.dark #lab {
+  background-color: #060c09 !important;
+  background-image: linear-gradient(180deg, #050b08 0%, #091510 50%, #060c09 100%) !important;
+  border-color: rgba(158, 209, 189, 0.18) !important;
+}
+
+html.dark .lab-tab-btn {
+  background-color: #0c1813 !important;
+  color: #edf0ff !important;
+  border: 1px solid rgba(158, 209, 189, 0.18) !important;
+}
+
+html.dark .lab-tab-btn.bg-primary-forest {
+  background-color: #1B4D3E !important;
+  color: #ffffff !important;
+  border-color: #1B4D3E !important;
+}
+
+/* Status Pulses */
+.pulse-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulseGreen 1.8s infinite;
+}
+
+.pulse-amber {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--tertiary-amber);
+  box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  animation: pulseAmber 1.8s infinite;
+}
+
+@keyframes pulseGreen {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+@keyframes pulseAmber {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(245, 158, 11, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+/* Action Buttons */
+.btn-adventure {
+  background-color: var(--secondary-vermilion);
+  color: #ffffff;
+  box-shadow: var(--shadow-glow);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-adventure:hover {
+  background-color: #d45220;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(230, 95, 43, 0.45);
+}
+
+.btn-forest {
+  background-color: var(--primary-forest);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(27, 77, 62, 0.2);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-forest:hover {
+  background-color: #143d31;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(27, 77, 62, 0.3);
+}
+
+.btn-glass {
+  background: rgba(27, 77, 62, 0.08);
+  border: 1px solid rgba(27, 77, 62, 0.25);
+  color: var(--primary-forest);
+  transition: all 0.2s ease;
+}
+
+.btn-glass:hover {
+  background: rgba(27, 77, 62, 0.15);
+  border-color: var(--primary-forest);
+}
+
+html.dark .btn-glass {
+  background: rgba(158, 209, 189, 0.08);
+  border-color: rgba(158, 209, 189, 0.25);
+  color: var(--primary-fixed-dim);
+}
+
+html.dark .btn-glass:hover {
+  background: rgba(158, 209, 189, 0.15);
+  border-color: var(--primary-fixed-dim);
+}
+
+/* Barcode simulation */
+.barcode-line {
+  display: inline-block;
+  height: 38px;
+  background-color: var(--neutral-slate);
+  margin-right: 2px;
+}
+
+html.dark .barcode-line {
+  background-color: var(--primary-fixed-dim);
+}

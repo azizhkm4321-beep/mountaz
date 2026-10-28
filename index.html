@@ -1,0 +1,2659 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MOUNTAZ — Reservasi Pendakian Gunung Indonesia</title>
+  <meta name="description" content="Jelajahi destinasi pendakian gunung Indonesia, cek informasi kuota, dan lakukan simulasi reservasi SIMAKSI di MOUNTAZ." />
+  <link rel="icon" type="image/png" href="asset/mountaz-mark.png" />
+  <meta property="og:title" content="MOUNTAZ — Reservasi Pendakian Gunung Indonesia" />
+  <meta property="og:description" content="Jelajahi destinasi pendakian gunung Indonesia, cek informasi kuota, dan lakukan simulasi reservasi SIMAKSI di MOUNTAZ." />
+  <meta property="og:image" content="asset/rinjani.jpg" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Typography: Manrope & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="preload" href="https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+  <noscript><link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.css" /></noscript>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.12.0/mapbox-gl.js" defer></script>
+
+  <!-- Prevent theme flicker on load -->
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem("mountaz-theme");
+        var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (saved === "dark" || (!saved && prefersDark)) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            surface: {
+              DEFAULT: '#f9f9ff',
+              dim: '#d3daef',
+              bright: '#f9f9ff',
+              lowest: '#ffffff',
+              low: '#f1f3ff',
+              container: '#e9edff',
+              high: '#e1e8fd',
+              highest: '#dce2f7',
+              variant: '#dce2f7',
+              mist: '#F4F7F5',
+              mist2: '#EAEFEA'
+            },
+            'on-surface': {
+              DEFAULT: '#141b2b',
+              variant: '#404945'
+            },
+            'inverse-surface': '#293040',
+            'inverse-on-surface': '#edf0ff',
+            primary: {
+              DEFAULT: '#003629',
+              forest: '#1B4D3E',
+              sub: '#0F382B',
+              container: '#1b4d3e',
+              'on-container': '#8abda9',
+              fixed: '#baeed9',
+              'fixed-dim': '#9ed1bd'
+            },
+            secondary: {
+              DEFAULT: '#aa3600',
+              vermilion: '#E65F2B',
+              container: '#fd703b',
+              'on-container': '#601b00',
+              fixed: '#ffdbcf',
+              'fixed-dim': '#ffb59c'
+            },
+            tertiary: {
+              DEFAULT: '#442800',
+              amber: '#F59E0B',
+              container: '#623c00',
+              'on-container': '#f69f0d',
+              fixed: '#ffddb8'
+            },
+            neutral: {
+              slate: '#111827',
+              dark: '#0e141f',
+              outline: '#707974',
+              'outline-variant': '#c0c9c3'
+            }
+          },
+          fontFamily: {
+            sans: ['Manrope', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          borderRadius: {
+            sm: '0.25rem',
+            DEFAULT: '0.5rem',
+            md: '0.75rem',
+            lg: '1rem',
+            xl: '1.5rem',
+            full: '9999px'
+          },
+          boxShadow: {
+            'card-rest': '0 4px 20px -2px rgba(15, 56, 43, 0.06)',
+            'card-hover': '0 12px 32px -4px rgba(17, 24, 39, 0.12), 0 2px 6px rgba(15, 56, 43, 0.04)',
+            'accent-glow': '0 0 16px rgba(230, 95, 43, 0.35)',
+            'emerald-glow': '0 0 20px rgba(27, 77, 62, 0.25)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* ==========================================================================
+       ALPINE EXPEDITION GLASS SYSTEM: LIGHT & DARK MODE PALETTES
+       ========================================================================== */
+    :root {
+      --surface-mist: #F4F7F5;
+      --surface-mist2: #EAEFEA;
+      --primary-forest: #1B4D3E;
+      --primary-dark: #003629;
+      --secondary-vermilion: #E65F2B;
+      --tertiary-amber: #F59E0B;
+      --neutral-slate: #111827;
+      --glass-bg: rgba(255, 255, 255, 0.76);
+      --glass-border: rgba(255, 255, 255, 0.6);
+      --ticket-bg: #ffffff;
+      --ticket-notch-bg: #F4F7F5;
+      --ticket-border: #dce2f7;
+      --topo-stroke: rgba(27, 77, 62, 0.035);
+      --input-bg: rgba(255, 255, 255, 0.92);
+      --input-border: #dce2f7;
+      --input-text: #141b2b;
+      --heading-text: #003629;
+      --body-text: #141b2b;
+      --muted-text: #404945;
+    }
+
+    /* Dark Mode Theme Tokens (High-Altitude Montane Night) */
+    html.dark {
+      --surface-mist: #08110d;
+      --surface-mist2: #0e1b15;
+      --primary-forest: #1b4d3e;
+      --primary-dark: #9ed1bd;
+      --secondary-vermilion: #E65F2B;
+      --tertiary-amber: #f69f0d;
+      --neutral-slate: #050b08;
+      --glass-bg: rgba(14, 27, 21, 0.84);
+      --glass-border: rgba(158, 209, 189, 0.18);
+      --ticket-bg: #0b1510;
+      --ticket-notch-bg: #08110d;
+      --ticket-border: rgba(158, 209, 189, 0.2);
+      --topo-stroke: rgba(158, 209, 189, 0.07);
+      --input-bg: rgba(16, 32, 25, 0.9);
+      --input-border: rgba(158, 209, 189, 0.25);
+      --input-text: #edf0ff;
+      --heading-text: #edf0ff;
+      --body-text: #e2ece6;
+      --muted-text: #8abda9;
+      color-scheme: dark;
+    }
+
+    body {
+      font-family: 'Manrope', sans-serif;
+      background-color: var(--surface-mist);
+      color: var(--body-text);
+      transition: background-color 0.3s ease, color 0.3s ease;
+      font-optical-sizing: auto;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(27, 77, 62, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(230, 95, 43, 0.03) 0%, transparent 40%),
+        url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 60 Q30 45 60 60 T120 60 M0 90 Q30 75 60 90 T120 90 M0 30 Q30 15 60 30 T120 30' fill='none' stroke='%231b4d3e' stroke-width='0.4' stroke-opacity='0.08'/%3E%3C/svg%3E");
+      background-size: 180% 180%, 180% 180%, 120px 120px;
+      animation: pageAmbientDrift 36s ease-in-out infinite alternate;
+    }
+
+    html.dark body {
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(27, 77, 62, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(230, 95, 43, 0.06) 0%, transparent 50%),
+        url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 60 Q30 45 60 60 T120 60 M0 90 Q30 75 60 90 T120 90 M0 30 Q30 15 60 30 T120 30' fill='none' stroke='%239ed1bd' stroke-width='0.4' stroke-opacity='0.05'/%3E%3C/svg%3E");
+    }
+    @keyframes pageAmbientDrift {
+      from { background-position: 0% 30%, 100% 70%, 0 0; }
+      to { background-position: 100% 70%, 0% 30%, 40px 30px; }
+    }
+
+
+    /* Tactile Glassmorphism */
+    .alpine-glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 4px 20px -2px rgba(15, 56, 43, 0.06);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+    .alpine-glass-dark {
+      background: rgba(11, 20, 16, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(158, 209, 189, 0.18);
+      box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Bi-Fold Boarding Pass with Perforated Notch Cut-outs */
+    .bifold-ticket {
+      position: relative;
+      background: var(--ticket-bg);
+      border: 1px solid var(--ticket-border);
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 8px 28px -4px rgba(17, 24, 39, 0.08);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .bifold-ticket:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 34px -4px rgba(17, 24, 39, 0.18);
+    }
+    .ticket-divider-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      margin: 0;
+      height: 24px;
+      overflow: visible;
+    }
+    .ticket-notch-left, .ticket-notch-right {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: var(--ticket-notch-bg);
+      border-radius: 50%;
+      z-index: 10;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .ticket-notch-left {
+      left: -10px;
+      border-right: 1px solid var(--ticket-border);
+    }
+    .ticket-notch-right {
+      right: -10px;
+      border-left: 1px solid var(--ticket-border);
+    }
+    .ticket-perforation {
+      width: 100%;
+      height: 1px;
+      border-top: 2px dashed rgba(158, 209, 189, 0.35);
+    }
+
+    /* EXPLICIT DARK MODE OVERRIDES FOR TICKETS (HERO & BOOKING) */
+    html.dark .bifold-ticket {
+      background: #0b1510 !important;
+      border-color: rgba(158, 209, 189, 0.2) !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45) !important;
+    }
+    html.dark .bifold-ticket .bg-gradient-to-br,
+    html.dark .ticket-top-segment {
+      background-color: #0e2017 !important;
+      background-image: linear-gradient(135deg, #0e2017 0%, #07120d 100%) !important;
+      border-bottom-color: rgba(158, 209, 189, 0.16) !important;
+      color: #edf0ff !important;
+    }
+    html.dark .bifold-ticket .bg-surface-lowest,
+    html.dark .ticket-bottom-segment {
+      background-color: #050d09 !important;
+      background-image: none !important;
+      color: #edf0ff !important;
+    }
+    html.dark .ticket-notch-left,
+    html.dark .ticket-notch-right {
+      background-color: #08110d !important;
+      border-color: rgba(158, 209, 189, 0.2) !important;
+    }
+    html.dark .ticket-perforation {
+      border-top-color: rgba(158, 209, 189, 0.35) !important;
+    }
+    html.dark .bifold-ticket .bg-surface-container {
+      background-color: #060d09 !important;
+      border: 1px solid rgba(158, 209, 189, 0.2) !important;
+      color: #edf0ff !important;
+    }
+
+    section[id]:not(#home),
+    footer {
+      position: relative;
+      isolation: isolate;
+      --section-glow: rgba(27, 77, 62, 0.22);
+      --section-contour: rgba(27, 77, 62, 0.12);
+    }
+    section[id]:not(#home)::before,
+    section[id]:not(#home)::after,
+    footer::before,
+    footer::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+    section[id]:not(#home)::before,
+    footer::before {
+      opacity: 0.8;
+      background-image:
+        radial-gradient(ellipse at 12% 18%, var(--section-glow), transparent 38%),
+        repeating-radial-gradient(ellipse at 82% 16%, transparent 0 42px, var(--section-contour) 43px, transparent 44px 72px);
+      background-size: 180% 180%, 220% 220%;
+      animation: sectionContourDrift 28s ease-in-out infinite alternate;
+    }
+    section[id]:not(#home)::after,
+    footer::after {
+      opacity: 0.65;
+      background:
+        radial-gradient(ellipse at 18% 78%, rgba(230, 95, 43, 0.12), transparent 34%),
+        radial-gradient(ellipse at 78% 72%, rgba(16, 185, 129, 0.13), transparent 38%);
+      background-size: 200% 200%;
+      animation: sectionAmbientDrift 12s ease-in-out infinite alternate;
+    }
+    @keyframes sectionContourDrift {
+      from { background-position: 0% 20%, 100% 0%; }
+      to { background-position: 100% 80%, 0% 100%; }
+    }
+    @keyframes sectionAmbientDrift {
+      from { background-position: 0% 50%; opacity: 0.45; }
+      to { background-position: 100% 50%; opacity: 0.8; }
+    }
+    section[id]:not(#home) > .max-w-7xl,
+    footer > .max-w-7xl {
+      position: relative;
+      z-index: 1;
+    }
+    html section[id]#radar3d {
+      --section-glow: rgba(16, 185, 129, 0.24);
+      --section-contour: rgba(158, 209, 189, 0.13);
+    }
+    html section[id]#destinasi,
+    html section[id]#pemesanan {
+      --section-glow: rgba(27, 77, 62, 0.2);
+      --section-contour: rgba(27, 77, 62, 0.11);
+    }
+    html section[id]#tentang {
+      --section-glow: rgba(230, 95, 43, 0.17);
+      --section-contour: rgba(27, 77, 62, 0.11);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      body,
+      section[id]:not(#home)::before,
+      section[id]:not(#home)::after,
+      footer::before,
+      footer::after {
+        animation: none;
+        transition: none;
+        transform: none;
+      }
+    }
+
+    /* SOP & TENTANG DARK MODE OVERRIDE */
+    html.dark #tentang {
+      background-color: #060d09 !important;
+      border-color: rgba(158, 209, 189, 0.16) !important;
+    }
+    html.dark #tentang .bg-surface-lowest {
+      background-color: #0b1611 !important;
+      border-color: rgba(158, 209, 189, 0.18) !important;
+    }
+
+    /* Status Pulses */
+    .pulse-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: #10b981;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulseGreen 1.8s infinite;
+    }
+    .pulse-amber {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: #F59E0B;
+      box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+      animation: pulseAmber 1.8s infinite;
+    }
+    @keyframes pulseGreen {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    @keyframes pulseAmber {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(245, 158, 11, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+
+    /* Topographic Contour Wave Canvas */
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transform: scale(1.08);
+      transition: opacity 1.2s ease;
+    }
+    .hero-slide.is-active {
+      opacity: 1;
+      animation: heroKenBurns 5s ease-out both;
+    }
+    @keyframes heroKenBurns {
+      from { transform: scale(1.07); }
+      to { transform: scale(1.015); }
+    }
+    .hero-atmosphere {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 36rem 28rem at 72% 40%, rgba(245, 158, 11, 0.08), transparent 72%);
+    }
+    .hero-atmosphere::after {
+      content: "";
+      position: absolute;
+      inset: -30% 0;
+      background: linear-gradient(110deg, transparent 34%, rgba(255, 255, 255, 0.055) 49%, transparent 64%);
+      transform: translateX(-65%);
+      animation: heroLightSweep 8s ease-in-out infinite;
+      will-change: transform;
+    }
+    @keyframes heroLightSweep {
+      0%, 18% { transform: translateX(-65%); }
+      82%, 100% { transform: translateX(65%); }
+    }
+    @keyframes heroContentEnter {
+      from { opacity: 0; transform: translate3d(0, 24px, 0) scale(0.985); }
+      to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+    }
+    @keyframes heroTicketFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+    html.hero-motion-ready [data-hero-reveal] {
+      opacity: 0;
+      animation: heroContentEnter 850ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+      animation-delay: var(--hero-delay, 0ms);
+    }
+    #home .hero-ticket-float {
+      animation: heroTicketFloat 7s ease-in-out 1s infinite;
+      will-change: transform;
+    }
+    #scrollProgress {
+      position: fixed;
+      inset: 0 auto auto 0;
+      z-index: 60;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, #10b981, #f59e0b, #E65F2B);
+      box-shadow: 0 0 12px rgba(230, 95, 43, 0.55);
+      pointer-events: none;
+      transform: scaleX(var(--scroll-progress, 0));
+      transform-origin: left center;
+      transition: transform 100ms linear;
+    }
+    html.motion-ready [data-reveal] {
+      opacity: 0;
+      transform: translate3d(0, 30px, 0) scale(0.985);
+      transition: opacity 750ms ease, transform 750ms cubic-bezier(0.2, 0.75, 0.25, 1);
+      transition-delay: var(--reveal-delay, 0ms);
+    }
+    html.motion-ready [data-reveal].is-visible {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    #destinationsGrid .bifold-ticket {
+      transition: transform 350ms cubic-bezier(0.2, 0.75, 0.25, 1), box-shadow 350ms ease, border-color 350ms ease;
+    }
+    #destinationsGrid .bifold-ticket:hover {
+      transform: translateY(-8px);
+      border-color: rgba(230, 95, 43, 0.48);
+      box-shadow: 0 22px 45px -18px rgba(15, 56, 43, 0.42), 0 0 0 1px rgba(230, 95, 43, 0.12);
+    }
+    #destinationsGrid .bifold-ticket img {
+      transition: transform 700ms cubic-bezier(0.2, 0.75, 0.25, 1), filter 500ms ease;
+    }
+    #destinationsGrid .bifold-ticket:hover img {
+      transform: scale(1.08);
+      filter: saturate(1.12);
+    }
+    #destinationsGrid .bifold-ticket:nth-child(3n + 2) { --reveal-delay: 90ms; }
+    #destinationsGrid .bifold-ticket:nth-child(3n) { --reveal-delay: 180ms; }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-slide,
+      .hero-slide.is-active,
+      .hero-atmosphere::after,
+      #home .hero-ticket-float,
+      #destinationsGrid .bifold-ticket,
+      #destinationsGrid .bifold-ticket img {
+        animation: none;
+        transition: none;
+        transform: none;
+      }
+      html.motion-ready [data-reveal] {
+        opacity: 1;
+        transform: none;
+      }
+      html.hero-motion-ready [data-hero-reveal] {
+        opacity: 1;
+        animation: none;
+        transform: none;
+      }
+    }
+
+    #topoCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    #mountainMap {
+      width: 100%;
+      height: min(72vh, 760px);
+      min-height: 480px;
+      background: #101a21;
+    }
+    .map-mountain-marker {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 2px solid rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      background: #173d32;
+      color: #fff;
+      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.5);
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .map-mountain-marker.is-active {
+      width: 40px;
+      height: 40px;
+      border-color: #fff;
+      background: #e65f2b;
+      box-shadow: 0 0 0 5px rgba(230, 95, 43, 0.28), 0 4px 16px rgba(0, 0, 0, 0.55);
+    }
+    #mountainMap .mapboxgl-popup-content {
+      border-radius: 12px;
+      padding: 14px;
+      font-family: Manrope, sans-serif;
+    }
+
+    /* Custom Scrollbar for Monospace Telemetry */
+    .telemetry-scroll::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .telemetry-scroll::-webkit-scrollbar-track {
+      background: rgba(17, 24, 39, 0.6);
+    }
+    .telemetry-scroll::-webkit-scrollbar-thumb {
+      background: #1B4D3E;
+      border-radius: 4px;
+    }
+
+    /* Barcode simulation */
+    .barcode-line {
+      display: inline-block;
+      height: 38px;
+      background-color: #111827;
+      margin-right: 2px;
+    }
+    html.dark .barcode-line {
+      background-color: #9ed1bd;
+    }
+
+    /* Button styles */
+    .btn-adventure {
+      background-color: #E65F2B;
+      color: #ffffff;
+      box-shadow: 0 4px 16px rgba(230, 95, 43, 0.35);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-adventure:hover {
+      background-color: #d45220;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(230, 95, 43, 0.45);
+    }
+    .btn-adventure:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    .btn-forest {
+      background-color: #1B4D3E;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(27, 77, 62, 0.2);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-forest:hover {
+      background-color: #143d31;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(27, 77, 62, 0.3);
+    }
+    .btn-forest:active {
+      transform: translateY(1px) scale(0.98);
+    }
+
+    .btn-glass {
+      background: rgba(27, 77, 62, 0.08);
+      border: 1px solid rgba(27, 77, 62, 0.25);
+      color: #1B4D3E;
+      transition: all 0.2s ease;
+    }
+    .btn-glass:hover {
+      background: rgba(27, 77, 62, 0.15);
+      border-color: #1B4D3E;
+    }
+    html.dark .btn-glass {
+      background: rgba(158, 209, 189, 0.08);
+      border-color: rgba(158, 209, 189, 0.25);
+      color: #9ed1bd;
+    }
+    html.dark .btn-glass:hover {
+      background: rgba(158, 209, 189, 0.15);
+      border-color: #9ed1bd;
+    }
+
+    /* Dark Mode Utility Class Adaptations */
+    html.dark .text-primary {
+      color: #edf0ff !important;
+    }
+    html.dark .text-on-surface-variant {
+      color: #8abda9 !important;
+    }
+    html.dark .text-on-surface {
+      color: #edf0ff !important;
+    }
+    html.dark .bg-surface-lowest {
+      background-color: #0b1510 !important;
+    }
+    html.dark .bg-surface-low {
+      background-color: #0e1b15 !important;
+    }
+    html.dark .bg-surface-container {
+      background-color: #13241d !important;
+      color: #edf0ff !important;
+    }
+    html.dark .border-surface-variant {
+      border-color: rgba(158, 209, 189, 0.16) !important;
+    }
+    html.dark .border-surface-container {
+      border-color: rgba(158, 209, 189, 0.14) !important;
+    }
+    html.dark input, html.dark select {
+      background-color: #102119 !important;
+      border-color: rgba(158, 209, 189, 0.25) !important;
+      color: #edf0ff !important;
+    }
+    html.dark input::placeholder {
+      color: #5d776b !important;
+    }
+
+    /* Light-mode surfaces and contrast for the intentionally dark demo panels */
+    html:not(.dark) #radar3d {
+      background: linear-gradient(145deg, #e7efeb, #f7f8f3 55%, #e9efea) !important;
+      border-color: #d0ddd5 !important;
+      color: #18362b !important;
+    }
+    html:not(.dark) #radar3d .text-white:not(.radar-btn) {
+      color: #18362b !important;
+    }
+    html:not(.dark) #radar3d .text-surface-dim,
+    html:not(.dark) #radar3d .text-neutral-outline {
+      color: #53675e !important;
+    }
+    html:not(.dark) #radar3d .map-weather-panel,
+    html:not(.dark) #radar3d .terrain-map-overlay {
+      background: rgba(255, 255, 255, 0.94) !important;
+      border-color: rgba(27, 77, 62, 0.2) !important;
+      color: #18362b !important;
+      box-shadow: 0 8px 24px rgba(15, 56, 43, 0.16) !important;
+    }
+    html:not(.dark) #radar3d .map-weather-panel .border-white\/15 {
+      border-color: rgba(27, 77, 62, 0.18) !important;
+    }
+    html:not(.dark) #radar3d .alpine-glass-dark {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: rgba(27, 77, 62, 0.16);
+      box-shadow: 0 8px 24px rgba(15, 56, 43, 0.1);
+    }
+    html:not(.dark) #radar3d .bg-white\/10 {
+      background-color: rgba(27, 77, 62, 0.08) !important;
+    }
+    html:not(.dark) #radar3d .text-secondary-fixed {
+      color: #9d3d1c !important;
+    }
+    html:not(.dark) #radar3d .radar-btn:not(.bg-primary-forest) {
+      color: #35574a !important;
+      border-color: rgba(27, 77, 62, 0.24) !important;
+    }
+    /* Real-time input validation feedback */
+    .input-valid { border-color: #10b981 !important; }
+    .input-error { border-color: #ef4444 !important; }
+
+    /* Print only the generated SIMAKSI document. */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 14mm;
+      }
+      body * {
+        visibility: hidden;
+      }
+      #printTicketContainer, #printTicketContainer * {
+        visibility: visible;
+      }
+      #printTicketContainer {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+      #printTicketContainer .bifold-ticket {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+
+    /* Scroll-to-Top Button */
+    .scroll-top-btn {
+      position: fixed;
+      bottom: 6rem;
+      right: 1.25rem;
+      z-index: 50;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--primary-forest);
+      font-size: 18px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 16px rgba(15, 56, 43, 0.12);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease, background 0.3s ease, visibility 0s linear 0.3s;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+      transition-delay: 0s;
+    }
+    .scroll-top-btn:hover {
+      background: var(--primary-forest);
+      color: #ffffff;
+      box-shadow: 0 6px 20px rgba(27, 77, 62, 0.3);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    html.dark .scroll-top-btn {
+      color: #9ed1bd;
+    }
+    html.dark .scroll-top-btn:hover {
+      background: #1b4d3e;
+      color: #ffffff;
+    }
+    @media (max-width: 639px) {
+      .scroll-top-btn {
+        bottom: 5.5rem;
+        right: 0.75rem;
+        width: 38px;
+        height: 38px;
+        font-size: 15px;
+      }
+    }
+
+    /* Active Navigation Link */
+    nav a.nav-active {
+      color: var(--secondary-vermilion) !important;
+    }
+    nav a.nav-active::after {
+      width: 100% !important;
+    }
+    .header-booking-link.nav-active {
+      outline: 2px solid rgba(230, 95, 43, 0.58);
+      outline-offset: 3px;
+    }
+
+    /* Mobile Dock Active State */
+    .mobile-dock-link.dock-active {
+      color: var(--secondary-vermilion) !important;
+      position: relative;
+    }
+    .mobile-dock-link.dock-active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 16px;
+      height: 2px;
+      background: var(--secondary-vermilion);
+      border-radius: 1px;
+    }
+
+    /* Map Loading Skeleton */
+    .map-skeleton {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: #101a21;
+      color: rgba(255, 255, 255, 0.6);
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      transition: opacity 0.5s ease;
+    }
+    .map-skeleton.is-loaded {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .map-skeleton-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba(158, 209, 189, 0.2);
+      border-top-color: #9ed1bd;
+      border-radius: 50%;
+      animation: mapSpinnerRotate 0.8s linear infinite;
+    }
+    @keyframes mapSpinnerRotate {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Equipment Checklist in Modal */
+    .equip-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .equip-check input[type="checkbox"] {
+      accent-color: #1B4D3E;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+    }
+    .equip-check.is-checked span {
+      text-decoration: line-through;
+      opacity: 0.5;
+    }
+
+    /* Share Button Tooltip */
+    .share-toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--primary-forest);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: 'Manrope', sans-serif;
+      font-weight: 600;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+    .share-toast.is-visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body class="relative min-h-screen text-on-surface antialiased selection:bg-secondary-vermilion selection:text-white">
+  <div id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- Main Navigation Header -->
+  <header class="sticky top-0 z-40 w-full alpine-glass border-b border-surface-variant transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="#home" class="flex items-center gap-3 group">
+        <img src="asset/mountaz-mark.png" alt="" aria-hidden="true" class="h-10 w-10 rounded-full bg-white object-cover p-0.5 shadow-md ring-1 ring-primary-forest/20 transition-transform group-hover:scale-105" />
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-primary-forest dark:text-white flex items-center gap-1.5">
+            MOUNTAZ <span class="text-xs font-mono px-2 py-0.5 rounded bg-surface-container font-semibold text-secondary-vermilion border border-secondary-container">Aziz-120</span>
+          </span>
+          <p class="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant">Sistem Ekspedisi &amp; Dispatch Jalur</p>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav id="desktopNav" class="hidden md:flex items-center gap-7 text-sm font-semibold">
+        <a href="#destinasi" class="section-nav-link text-on-surface hover:text-secondary-vermilion transition-colors py-1 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-secondary-vermilion hover:after:w-full after:transition-all">
+          Destinasi
+        </a>
+        <a href="#radar3d" class="section-nav-link text-on-surface hover:text-secondary-vermilion transition-colors py-1 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-secondary-vermilion hover:after:w-full after:transition-all">
+          Radar Topografi
+        </a>
+        <a href="#tentang" class="section-nav-link text-on-surface hover:text-secondary-vermilion transition-colors py-1 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-secondary-vermilion hover:after:w-full after:transition-all">
+          SOP Simaksi
+        </a>
+      </nav>
+
+      <!-- Right Action CTA -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a href="#pemesanan" class="header-booking-link btn-adventure px-3 sm:px-5 py-2.5 rounded-lg text-xs font-mono font-bold tracking-wide uppercase inline-flex items-center gap-2">
+          <span class="sm:hidden">Pesan</span>
+          <span class="hidden sm:inline">Pesan Slot Kuota</span>
+        </a>
+        <button id="themeToggle" type="button" class="alpine-glass px-2 sm:px-3 py-2 rounded-full text-xs font-mono font-bold text-primary-forest dark:text-primary-fixed flex items-center gap-2 hover:opacity-90 transition-all shadow-md border border-surface-variant" title="Ganti Mode Tampilan (Terang / Malam)" aria-label="Ganti mode tampilan">
+          <span id="themeIcon" class="text-sm">🌙</span>
+          <span id="themeLabel" class="hidden sm:inline">MODE MALAM</span>
+        </button>
+
+        <!-- Mobile Menu Hamburger -->
+        <button id="mobileMenuBtn" type="button" class="md:hidden p-2 rounded-lg text-primary-forest dark:text-white hover:bg-surface-container" aria-label="Buka menu navigasi">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobileMenu" class="hidden md:hidden alpine-glass border-t border-surface-variant px-6 py-4 space-y-3">
+      <a href="#destinasi" class="block font-medium py-1.5 text-on-surface hover:text-primary-forest" onclick="closeMobileMenu(event, 'destinasi')">Destinasi Jalur</a>
+      <a href="#radar3d" class="block font-medium py-1.5 text-on-surface hover:text-primary-forest" onclick="closeMobileMenu(event, 'radar3d')">Radar Topografi 3D</a>
+      <a href="#pemesanan" class="block font-medium py-1.5 text-secondary-vermilion font-bold" onclick="closeMobileMenu(event, 'pemesanan')">Pesan Tiket &amp; SIMAKSI</a>
+      <div class="pt-2 border-t border-surface-variant flex justify-between items-center text-xs font-mono">
+        <span class="text-neutral-outline">PILIHAN TEMA:</span>
+        <button id="mobileThemeToggle" class="px-3 py-1 rounded bg-surface-container text-primary-forest font-bold">
+          <span id="mobileThemeLabel">Ganti ke Mode Malam (🌙)</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION: Alpine Atmosphere & Live Dispatch Header -->
+  <section id="home" class="relative pt-12 pb-24 md:pt-20 md:pb-32 overflow-hidden border-b border-surface-variant bg-surface-mist dark:bg-[#08110d]">
+    <!-- Local Mountain Photo Slideshow -->
+    <div id="heroSlideshow" class="absolute inset-0" aria-hidden="true">
+      <img class="hero-slide is-active" src="asset/bromo.jpg" alt="" />
+      <img class="hero-slide" src="asset/semeru.jpg" alt="" loading="lazy" />
+      <img class="hero-slide" src="asset/prau.jpg" alt="" loading="lazy" />
+      <img class="hero-slide" src="asset/lawu.jpg" alt="" loading="lazy" />
+      <img class="hero-slide" src="asset/rinjani.jpg" alt="" loading="lazy" />
+      <img class="hero-slide" src="asset/arjuno-welirang.jpg" alt="" loading="lazy" />
+      <img class="hero-slide" src="asset/merbabu.jpg" alt="" loading="lazy" />
+    </div>
+    <div class="absolute inset-0 z-[1] bg-gradient-to-r from-surface-mist/95 via-surface-mist/80 to-surface-mist/25 dark:from-[#08110d]/95 dark:via-[#08110d]/80 dark:to-[#08110d]/35"></div>
+    <!-- Topographic Canvas Overlay -->
+    <canvas id="topoCanvas"></canvas>
+    <div class="hero-atmosphere" aria-hidden="true"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        
+        <!-- Left Hero Copy -->
+        <div class="lg:col-span-7 space-y-6">
+          <div data-hero-reveal style="--hero-delay: 80ms" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full alpine-glass text-xs font-mono font-medium text-primary-forest dark:text-primary-fixed border border-surface-variant">
+            <span class="pulse-dot"></span>
+            <span>INFORMASI JALUR &amp; KUOTA PENDAKIAN</span>
+            <span class="text-neutral-outline">|</span>
+            <span class="text-secondary-vermilion font-bold">V-2.4.9</span>
+          </div>
+
+          <h1 data-hero-reveal style="--hero-delay: 180ms" class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-primary dark:text-white leading-[1.1]">
+            Akses Ekspedisi<br />
+            <span class="text-secondary-vermilion">Gunung Indonesia</span><br />
+            Berbasis Presisi Telemetri.
+          </h1>
+
+          <p data-hero-reveal style="--hero-delay: 280ms" class="text-base sm:text-lg text-on-surface-variant max-w-2xl leading-relaxed">
+            Jelajahi informasi jalur dan kuota pendakian, bandingkan destinasi, lalu lakukan simulasi reservasi SIMAKSI dengan mudah.
+          </p>
+
+          <!-- Quick Action Buttons -->
+          <div data-hero-reveal style="--hero-delay: 380ms" class="pt-2 flex flex-wrap items-center gap-4">
+            <a href="#pemesanan" class="btn-adventure px-7 py-3.5 rounded-xl font-mono text-sm font-bold tracking-wide uppercase inline-flex items-center gap-3">
+              <span>Ambil Slot Kuota</span>
+              <span>↓</span>
+            </a>
+            <a href="#destinasi" class="btn-forest px-6 py-3.5 rounded-xl font-mono text-sm font-bold tracking-wide uppercase inline-flex items-center gap-2">
+              <span>Lihat Destinasi</span>
+              <span>⚡</span>
+            </a>
+            <a href="#radar3d" class="btn-glass px-5 py-3.5 rounded-xl font-mono text-sm font-semibold tracking-wide inline-flex items-center gap-2">
+              <span>Radar Topografi</span>
+              <span>◈</span>
+            </a>
+          </div>
+
+          <!-- Quick Telemetry HUD Counters -->
+          <div data-hero-reveal style="--hero-delay: 480ms" class="pt-6 grid grid-cols-3 gap-4 border-t border-surface-variant max-w-xl">
+            <div class="space-y-1">
+              <p class="font-mono text-xs uppercase tracking-wider text-neutral-outline">Puncak Terdata</p>
+              <p class="text-2xl font-bold font-mono text-primary-forest dark:text-primary-fixed"><span id="peakCountStat">00</span> <span class="text-xs text-neutral-outline">PEAKS</span></p>
+              <p class="text-[11px] text-on-surface-variant">Destinasi pendakian terdata</p>
+            </div>
+            <div class="space-y-1 border-l border-surface-variant pl-4">
+              <p class="font-mono text-xs uppercase tracking-wider text-neutral-outline">Puncak Tertinggi</p>
+              <p class="text-2xl font-bold font-mono text-secondary-vermilion"><span id="highestPeakStat">0</span> <span class="text-xs font-sans text-neutral-outline">MDPL</span></p>
+              <p id="highestPeakName" class="text-[11px] text-on-surface-variant">Memuat puncak tertinggi</p>
+            </div>
+            <div class="space-y-1 border-l border-surface-variant pl-4">
+              <p class="font-mono text-xs uppercase tracking-wider text-neutral-outline">Filter Destinasi</p>
+              <p class="text-2xl font-bold font-mono text-primary-forest dark:text-primary-fixed">03 <span class="text-xs text-neutral-outline">FILTER</span></p>
+              <p class="text-[11px] text-on-surface-variant">Nama, wilayah, kesulitan</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero: Live Telemetry Pass Preview (Dark Bi-Fold Ticket) -->
+        <div data-hero-reveal style="--hero-delay: 260ms" class="lg:col-span-5">
+          <div class="relative mx-auto max-w-md">
+            
+            <!-- Atmospheric Halo -->
+            <div class="absolute -inset-2 bg-gradient-to-r from-primary-container to-secondary-container rounded-2xl opacity-20 blur-xl"></div>
+
+            <!-- Preview Card: Bi-Fold Alpine Boarding Pass -->
+            <div class="bifold-ticket hero-ticket-float relative z-10 border border-surface-variant shadow-card-hover dark:bg-[#0b1510]">
+              
+              <!-- Top Card Segment (Dark & High Contrast) -->
+              <div class="p-6 bg-gradient-to-br from-surface-lowest to-surface-low dark:from-[#0e2017] dark:to-[#07120d] border-b border-surface-container ticket-top-segment">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-primary-forest text-white">
+                      PERMIT RESMI TN-04
+                    </span>
+                    <h3 class="text-2xl font-bold text-primary dark:text-white mt-2">Gunung Rinjani</h3>
+                    <p class="text-xs text-on-surface-variant dark:text-[#8abda9]">Jalur Sembalun – Danau Segara Anak</p>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-xs font-mono font-bold text-secondary-vermilion">3,726 MDPL</span>
+                    <p class="text-[10px] font-mono text-neutral-outline">KONTUR VOLCANIC</p>
+                  </div>
+                </div>
+
+                <div class="mt-4 grid grid-cols-3 gap-2 py-3 px-3.5 rounded-lg bg-surface-container dark:bg-[#060d09] dark:border dark:border-[#1b4d3e]/30 text-xs font-mono">
+                  <div>
+                    <p class="text-[10px] text-neutral-outline">STATUS</p>
+                    <p class="font-bold text-primary-forest dark:text-primary-fixed flex items-center gap-1">
+                      <span class="pulse-dot"></span> KUOTA ADA
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] text-neutral-outline">SLOT SISA</p>
+                    <p class="font-bold text-secondary-vermilion" id="heroQuotaSlot">14 / 150</p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] text-neutral-outline">TIKET RESMI</p>
+                    <p class="font-bold text-primary dark:text-white">Rp75.000</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ticket Notch Divider with Perforated Line -->
+              <div class="ticket-divider-wrap">
+                <div class="ticket-notch-left"></div>
+                <div class="ticket-perforation"></div>
+                <div class="ticket-notch-right"></div>
+              </div>
+
+              <!-- Bottom Card Segment (Monospace Telemetry & Barcode) -->
+              <div class="p-6 bg-surface-lowest dark:bg-[#050d09] space-y-4 ticket-bottom-segment">
+                <div class="flex items-center justify-between text-xs font-mono">
+                  <div>
+                    <p class="text-[10px] text-neutral-outline uppercase">Kode Simaksi Digital</p>
+                    <p class="font-bold text-neutral-slate dark:text-white">#TN-RIN-2026-X89</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-[10px] text-neutral-outline uppercase">Koordinat Ranger</p>
+                    <p class="text-neutral-slate dark:text-surface-dim font-medium">8.4117°S, 116.4567°E</p>
+                  </div>
+                </div>
+
+                <!-- Simulated Barcode & Security Stamp -->
+                <div class="flex items-center justify-between pt-2">
+                  <div class="flex items-center h-8" title="Barcode Digital Transit">
+                    <span class="barcode-line w-1"></span>
+                    <span class="barcode-line w-2"></span>
+                    <span class="barcode-line w-0.5"></span>
+                    <span class="barcode-line w-3"></span>
+                    <span class="barcode-line w-1"></span>
+                    <span class="barcode-line w-2"></span>
+                    <span class="barcode-line w-1.5"></span>
+                    <span class="barcode-line w-2.5"></span>
+                    <span class="barcode-line w-1"></span>
+                    <span class="barcode-line w-3"></span>
+                  </div>
+                  <div class="text-right">
+                    <span class="inline-block px-2 py-1 rounded text-[9px] font-mono font-bold bg-surface-container text-primary-forest dark:text-primary-fixed border border-primary-forest/20">
+                      SECURE TELEMETRY VALIDATED
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Quick Button to Book -->
+                <button onclick="quickSelectDestination('rinjani')" class="w-full py-2.5 rounded-lg btn-adventure text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2">
+                  <span>Proses Simaksi Jalur Ini</span>
+                  <span>→</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE MAP AND 3D TERRAIN -->
+  <section id="radar3d" class="relative overflow-hidden border-y border-white/10 bg-[#07111b] py-10 md:py-14 text-white">
+    <div class="mx-auto max-w-[1600px] px-3 sm:px-6">
+      <div class="mb-4 flex flex-col justify-between gap-3 md:flex-row md:items-end">
+        <div>
+          <div class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-mono text-secondary-fixed">
+            <span>PETA PENDAKIAN INDONESIA</span><span>•</span><span>MAPBOX 3D TERRAIN</span>
+          </div>
+          <h2 class="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">Jelajahi Bentuk Gunung 3D</h2>
+          <p class="mt-1 max-w-2xl text-sm text-surface-dim">
+            Fokus lebih dekat pada relief, punggungan, dan kontur medan
+          </p>
+        </div>
+      </div>
+
+      <div class="relative overflow-hidden rounded-2xl border border-white/15 bg-neutral-dark shadow-2xl">
+        <div id="mountainMap" role="region" aria-label="Peta relief dan elevasi 3D gunung Indonesia"></div>
+        <div class="map-weather-panel absolute left-3 top-3 z-10 w-64 rounded-xl border border-white/10 bg-neutral-dark/90 px-3 py-3 text-white shadow-lg backdrop-blur-md sm:left-5 sm:top-5 sm:w-72">
+          <p id="radarName" class="text-sm font-bold text-white">MT. ARJUNO-WELIRANG</p>
+          <p class="mt-0.5 text-[11px] text-surface-dim">ALTITUDE <span id="radarAlt" class="font-semibold text-white">3,339 MDPL</span></p>
+          <p id="radarCoord" class="text-[10px] text-surface-dim">7.7667° S, 112.5833° E</p>
+          <div class="mt-2 border-t border-white/15 pt-2">
+            <div class="flex items-center justify-between gap-2">
+              <p class="text-[9px] font-mono font-bold uppercase tracking-wider text-surface-dim">Cuaca sekitar</p>
+              <span id="weatherUpdated" class="text-[9px] font-mono text-surface-dim">Memuat...</span>
+            </div>
+            <div class="mt-1 flex items-center justify-between gap-2">
+              <p id="weatherCondition" class="text-xs font-semibold">Mengambil data cuaca...</p>
+              <p id="weatherTemperature" class="text-lg font-bold">--°</p>
+            </div>
+            <div class="mt-1 flex gap-4 text-[10px] text-surface-dim">
+              <p>Hujan <span id="weatherRain" class="font-semibold text-white">--</span></p>
+              <p>Angin <span id="weatherWind" class="font-semibold text-white">--</span></p>
+            </div>
+          </div>
+        </div>
+        <p id="terrainDataStatus" class="terrain-map-overlay terrain-map-status absolute bottom-0 left-0 z-20 max-w-[calc(100%-8px)] rounded-lg border border-white/10 bg-neutral-dark/95 px-3 py-2 text-[11px] text-white shadow-lg backdrop-blur-md sm:left-0" role="status" aria-live="polite">
+          Relief dan kontur 3D siap · geser peta untuk menjelajah.
+        </p>
+        <div class="terrain-map-overlay pointer-events-none absolute bottom-0 right-0 z-20 max-w-[calc(100%-8px)] rounded-lg border border-white/10 bg-neutral-dark/95 px-3 py-2 text-[10px] text-white/90 shadow-lg backdrop-blur-md sm:right-0">
+          <span class="hidden sm:inline">Seret untuk menggeser · klik kanan untuk memutar · scroll untuk melihat relief</span>
+          <span class="sm:hidden">Geser untuk menggeser · cubit untuk zoom</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FEATURED EXPEDITION DESTINATIONS (Pilihan Jalur & Kuota) -->
+  <section id="destinasi" class="py-16 md:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Section Header -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-mono font-semibold tracking-wider uppercase text-primary-forest dark:text-primary-fixed">
+            <span>REGISTER NASIONAL</span>
+            <span>//</span>
+            <span>BALAI TAMAN NASIONAL</span>
+          </div>
+          <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-primary dark:text-white mt-1">
+            Katalog Destinasi &amp; Status Kuota
+          </h2>
+          <p class="text-sm text-on-surface-variant mt-2 max-w-xl">
+            Jelajahi pilihan gunung dari berbagai pulau. Cari berdasarkan nama, wilayah, atau jalur; lalu saring dan urutkan sesuai rencana pendakian.
+          </p>
+        </div>
+
+        <!-- Filter & Search Controls -->
+        <div class="flex w-full flex-col gap-3 md:w-auto md:flex-row md:flex-wrap md:items-center md:justify-end">
+          <input id="searchInput" type="search" placeholder="Cari nama gunung..." class="w-full px-3.5 py-2 rounded-lg text-xs font-mono border border-surface-variant focus:outline-none focus:ring-2 focus:ring-primary-forest md:w-52" />
+
+          <select id="regionFilter" class="w-full px-3 py-2 rounded-lg text-xs font-mono border border-surface-variant focus:outline-none focus:ring-2 focus:ring-primary-forest md:w-auto">
+            <option value="">Semua Wilayah</option>
+          </select>
+
+          <select id="diffFilter" class="w-full px-3 py-2 rounded-lg text-xs font-mono border border-surface-variant focus:outline-none focus:ring-2 focus:ring-primary-forest md:w-auto">
+            <option value="">Semua Kesulitan</option>
+            <option value="Mudah">Mudah</option>
+            <option value="Menengah">Menengah</option>
+            <option value="Sulit">Sulit</option>
+          </select>
+
+          <select id="sortSelect" class="w-full px-3 py-2 rounded-lg text-xs font-mono border border-surface-variant focus:outline-none focus:ring-2 focus:ring-primary-forest md:w-auto">
+            <option value="default">Default</option>
+            <option value="alt-desc">Elevasi Tertinggi</option>
+            <option value="price-asc">Harga Termurah</option>
+            <option value="name-asc">Nama A-Z</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Destinations Grid of Bi-Fold Pass Cards -->
+      <p id="destinationResults" class="mb-4 text-xs font-mono text-neutral-outline" aria-live="polite"></p>
+      <div id="destinationsGrid" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <!-- Rendered dynamically via JS with Bi-Fold cut-out aesthetics -->
+      </div>
+
+    </div>
+  </section>
+
+  <!-- EXPEDITION BOOKING & SIMAKSI PASS GENERATOR -->
+  <section id="pemesanan" class="py-16 md:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        <!-- Left: Booking Form -->
+        <div class="lg:col-span-6 space-y-6">
+          <div>
+            <div class="inline-flex items-center gap-2 text-xs font-mono font-bold tracking-wider uppercase text-secondary-vermilion">
+              <span>CHECKOUT RESMI SIMAKSI</span>
+              <span>//</span>
+              <span>SLOT RESERVASI</span>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-primary dark:text-white tracking-tight mt-1">
+              Reservasi &amp; Cetak SIMAKSI Pendakian
+            </h2>
+            <p class="text-sm text-on-surface-variant mt-2 leading-relaxed">
+              Daftarkan tim ekspedisi Anda untuk membuat dokumen SIMAKSI digital berisi data rombongan, jalur, tanggal masuk, dan kode verifikasi.
+            </p>
+          </div>
+
+          <!-- Form Element -->
+          <form id="bookingForm" class="alpine-glass p-6 sm:p-8 rounded-2xl border border-surface-variant space-y-4 shadow-card-rest dark:bg-[#0c1813] dark:border-white/15">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="hikerName" class="block text-xs font-mono font-bold text-on-surface mb-1.5 uppercase">Nama Ketua Rombongan *</label>
+                <input id="hikerName" type="text" required placeholder="Contoh: Muhammad Azizul" class="w-full px-3.5 py-2.5 rounded-lg text-xs font-mono border border-surface-variant focus:ring-2 focus:ring-primary-forest outline-none transition-all" />
+              </div>
+              <div>
+                <label for="hikerPhone" class="block text-xs font-mono font-bold text-on-surface mb-1.5 uppercase">Nomor Telepon / Satelit *</label>
+                <input id="hikerPhone" type="tel" required placeholder="Contoh: 081234567890" class="w-full px-3.5 py-2.5 rounded-lg text-xs font-mono border border-surface-variant focus:ring-2 focus:ring-primary-forest outline-none transition-all" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="destinationSelect" class="block text-xs font-mono font-bold text-on-surface mb-1.5 uppercase">Destinasi Gunung *</label>
+                <select id="destinationSelect" required class="w-full px-3.5 py-2.5 rounded-lg text-xs font-mono border border-surface-variant focus:ring-2 focus:ring-primary-forest outline-none transition-all">
+                  <!-- Populated via JS -->
+                </select>
+              </div>
+              <div>
+                <label for="hikeDate" class="block text-xs font-mono font-bold text-on-surface mb-1.5 uppercase">Tanggal Masuk (Entry) *</label>
+                <input id="hikeDate" type="date" required class="w-full px-3.5 py-2.5 rounded-lg text-xs font-mono border border-surface-variant focus:ring-2 focus:ring-primary-forest outline-none transition-all" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+              <div>
+                <label for="hikerCount" class="block text-xs font-mono font-bold text-on-surface mb-1.5 uppercase">Jumlah Pendaki (Slot Tiket)</label>
+                <input id="hikerCount" type="number" min="1" max="10" value="1" required class="w-full px-3.5 py-2.5 rounded-lg text-xs font-mono border border-surface-variant focus:ring-2 focus:ring-primary-forest outline-none transition-all" />
+              </div>
+              <div class="p-3 rounded-lg bg-surface-container dark:bg-[#060d09] dark:border dark:border-[#1b4d3e]/30 border border-surface-variant text-xs font-mono">
+                <span class="text-neutral-outline block text-[10px]">TOTAL RETRIBUSI RESMI</span>
+                <span id="bookingTotalFee" class="text-base font-bold text-primary-forest dark:text-primary-fixed">Rp35.000</span>
+              </div>
+            </div>
+
+            <!-- Submit CTA -->
+            <button type="submit" class="w-full btn-adventure py-3.5 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 mt-2 shadow-lg">
+              <span>Konfirmasi Alokasi Kuota &amp; Terbitkan Simaksi</span>
+              <span>✓</span>
+            </button>
+
+            <!-- Reset Form Button -->
+            <button type="button" onclick="resetBookingForm()" class="w-full btn-glass py-3 rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2">
+              <span>↺ Reset Form</span>
+            </button>
+
+            <p class="text-[11px] text-neutral-outline text-center">
+              * Data simulasi perizinan. Dokumen SIMAKSI ini dapat dicetak untuk keperluan pemeriksaan.
+            </p>
+          </form>
+        </div>
+
+        <!-- Right: Generated SIMAKSI Document -->
+        <div class="lg:col-span-6 space-y-6">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-bold text-primary dark:text-white font-mono flex items-center gap-2">
+              <span>DOKUMEN SIMAKSI DIGITAL</span>
+            </h3>
+            <button id="btnPrintTicket" onclick="printSimaksiPass()" class="btn-forest px-3.5 py-1.5 rounded-lg text-xs font-mono font-semibold flex items-center gap-1.5" disabled>
+              <span>🖨️ Cetak SIMAKSI</span>
+            </button>
+          </div>
+
+          <!-- The Live Bi-Fold Ticket Container -->
+          <div id="printTicketContainer">
+            <div id="liveTicketPass" class="bifold-ticket border border-surface-variant shadow-xl dark:bg-[#0b1510]">
+              
+              <!-- Ticket Upper Segment (Dark Gradient in Dark Mode) -->
+              <div class="p-6 bg-gradient-to-br from-surface-lowest to-surface-low dark:from-[#0e2017] dark:to-[#07120d] ticket-top-segment">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <p class="mb-1 text-[10px] font-mono font-bold tracking-wider text-secondary-vermilion">SURAT IZIN MASUK KAWASAN KONSERVASI · SIMAKSI</p>
+                    <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-primary-forest text-white">
+                      SIMULASI DOKUMEN PERIZINAN
+                    </div>
+                    <h4 id="passMountainName" class="text-2xl font-bold text-primary dark:text-white mt-2">Gunung Bromo</h4>
+                    <p id="passRouteName" class="text-xs text-on-surface-variant dark:text-[#8abda9]">Cemoro Lawang – Lautan Pasir – Penanjakan</p>
+                  </div>
+                  <div class="text-right">
+                    <span id="passAltitude" class="text-sm font-mono font-bold text-secondary-vermilion">2,329 MDPL</span>
+                    <p class="text-[10px] font-mono text-neutral-outline">ZONA KONSERVASI</p>
+                  </div>
+                </div>
+
+                <div class="mt-4 grid grid-cols-3 gap-2 py-3 px-3.5 rounded-lg bg-surface-container dark:bg-[#060d09] dark:border dark:border-[#1b4d3e]/30 text-xs font-mono">
+                  <div>
+                    <p class="text-[10px] text-neutral-outline">KETUA TIM</p>
+                    <p id="passLeaderName" class="font-bold text-primary-forest dark:text-primary-fixed truncate">Muhammad Azizul</p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] text-neutral-outline">TANGGAL MASUK</p>
+                    <p id="passEntryDate" class="font-bold text-neutral-slate dark:text-white">2026-10-22</p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] text-neutral-outline">JUMLAH PERSONEL</p>
+                    <p id="passPersonCount" class="font-bold text-secondary-vermilion">1 Pendaki</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Bi-Fold Notch Divider -->
+              <div class="ticket-divider-wrap">
+                <div class="ticket-notch-left"></div>
+                <div class="ticket-perforation"></div>
+                <div class="ticket-notch-right"></div>
+              </div>
+
+              <!-- Ticket Lower Segment (QR Code & Technical Hashes) -->
+              <div class="p-6 bg-surface-lowest dark:bg-[#050d09] space-y-4 ticket-bottom-segment">
+                <div class="flex items-center justify-between">
+                  
+                  <!-- Left Data Hash -->
+                  <div class="space-y-1 text-xs font-mono">
+                    <p class="text-[10px] text-neutral-outline uppercase">Kode Hash Registrasi Simaksi</p>
+                    <p id="passHash" class="text-sm font-bold text-neutral-slate dark:text-white">#SIMAKSI-BRM-849201</p>
+                    <p class="text-[10px] text-primary-forest dark:text-primary-fixed font-semibold flex items-center gap-1">
+                      <span class="pulse-dot"></span> STATUS: TERVERIFIKASI SISTEM
+                    </p>
+                    <p class="text-[10px] text-neutral-outline">TOTAL RETRIBUSI: <span id="passTotalFee" class="text-primary dark:text-primary-fixed font-bold">Rp35.000</span></p>
+                    <span id="passVerifiedBadge" class="hidden inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-primary-forest text-white">
+                      ✓ TERVERIFIKASI SISTEM
+                    </span>
+                  </div>
+
+                  <!-- Dynamic QR Code Canvas -->
+                  <div class="p-2 bg-white rounded-lg border border-surface-variant shadow-sm" title="Scan QR di Pos Ranger">
+                    <canvas id="qrCanvas" width="80" height="80" class="w-20 h-20"></canvas>
+                  </div>
+
+                </div>
+
+                <!-- Legal Security Notice -->
+                <div class="pt-2 border-t border-surface-container flex items-center justify-between text-[10px] font-mono text-neutral-outline">
+                  <span>SISTEM DISPATCH RESMI MOUNTAZ 2026</span>
+                  <span>TAMPILKAN KE PETUGAS RESORT</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Stored Booking History on Device -->
+          <div class="alpine-glass p-5 rounded-2xl border border-surface-variant space-y-3 dark:bg-[#0c1813] dark:border-white/15">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold text-primary dark:text-white">RIWAYAT SIMAKSI TERSIMPAN DI PERANGKAT:</span>
+              <button onclick="clearBookingHistory()" class="text-[11px] font-mono text-red-500 hover:underline">
+                Hapus Riwayat
+              </button>
+            </div>
+            <div id="bookingHistoryList" class="space-y-2 text-xs font-mono max-h-44 overflow-y-auto telemetry-scroll">
+              <p class="text-neutral-outline">Belum ada riwayat pemesanan yang dibuat.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SOP & ETHICAL WILDERNESS GUIDELINES (Tentang & Konservasi) -->
+  <section id="tentang" class="py-16 md:py-24 bg-surface-low dark:bg-[#060d09] border-t border-surface-variant">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mb-9 max-w-3xl" data-reveal>
+        <div class="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-primary-forest dark:text-primary-fixed">
+          <span>SOP &amp; ETIKA PENDAKIAN</span><span>//</span><span>PANDUAN BERTANGGUNG JAWAB</span>
+        </div>
+        <h2 class="mt-2 text-3xl md:text-4xl font-extrabold text-primary dark:text-white tracking-tight">
+          Persiapan matang,<br /><span class="text-secondary-vermilion">perjalanan lebih bertanggung jawab.</span>
+        </h2>
+        <p class="mt-3 text-sm md:text-base text-on-surface-variant leading-relaxed">
+          Pendakian yang baik dimulai sebelum tiba di basecamp. Gunakan panduan ini sebagai pengingat umum; peraturan, kuota, jalur, dan prosedur darurat dapat berbeda di setiap kawasan.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <article class="rounded-2xl border border-surface-variant bg-surface-lowest p-5 shadow-sm dark:bg-[#0b1611]" data-reveal>
+          <div class="flex items-center justify-between">
+            <span class="grid h-10 w-10 place-items-center rounded-xl bg-primary-forest/10 text-lg" aria-hidden="true">▣</span>
+            <span class="font-mono text-xs font-bold text-neutral-outline">01 / RENCANA</span>
+          </div>
+          <h3 class="mt-4 text-base font-extrabold text-primary-forest dark:text-primary-fixed">Sebelum berangkat</h3>
+          <ul class="mt-3 space-y-2 text-xs leading-relaxed text-on-surface-variant">
+            <li>• Daftar melalui kanal resmi dan pahami aturan kawasan.</li>
+            <li>• Cek status jalur, prakiraan cuaca, serta batas waktu pendakian.</li>
+            <li>• Beri tahu kontak tepercaya tentang rencana dan anggota tim.</li>
+          </ul>
+        </article>
+
+        <article class="rounded-2xl border border-surface-variant bg-surface-lowest p-5 shadow-sm dark:bg-[#0b1611]" data-reveal>
+          <div class="flex items-center justify-between">
+            <span class="grid h-10 w-10 place-items-center rounded-xl bg-secondary-vermilion/10 text-lg" aria-hidden="true">⌁</span>
+            <span class="font-mono text-xs font-bold text-neutral-outline">02 / PERLENGKAPAN</span>
+          </div>
+          <h3 class="mt-4 text-base font-extrabold text-primary-forest dark:text-primary-fixed">Siapkan kebutuhan tim</h3>
+          <ul class="mt-3 space-y-2 text-xs leading-relaxed text-on-surface-variant">
+            <li>• Bawa pakaian berlapis, pelindung hujan, dan alas kaki yang sesuai.</li>
+            <li>• Siapkan air, makanan, penerangan, baterai cadangan, dan P3K pribadi.</li>
+            <li>• Pastikan perlengkapan bersama dan cara komunikasi sudah disepakati.</li>
+          </ul>
+        </article>
+
+        <article class="rounded-2xl border border-surface-variant bg-surface-lowest p-5 shadow-sm dark:bg-[#0b1611]" data-reveal>
+          <div class="flex items-center justify-between">
+            <span class="grid h-10 w-10 place-items-center rounded-xl bg-tertiary-amber/15 text-lg" aria-hidden="true">↟</span>
+            <span class="font-mono text-xs font-bold text-neutral-outline">03 / DI JALUR</span>
+          </div>
+          <h3 class="mt-4 text-base font-extrabold text-primary-forest dark:text-primary-fixed">Jaga jalur dan sesama</h3>
+          <ul class="mt-3 space-y-2 text-xs leading-relaxed text-on-surface-variant">
+            <li>• Tetap di jalur resmi dan ikuti arahan petugas atau pemandu.</li>
+            <li>• Sesuaikan tempo dengan anggota tim; jangan tinggalkan siapa pun.</li>
+            <li>• Hormati pendaki lain, satwa, tumbuhan, dan area yang dibatasi.</li>
+          </ul>
+        </article>
+
+        <article class="rounded-2xl border border-surface-variant bg-surface-lowest p-5 shadow-sm dark:bg-[#0b1611]" data-reveal>
+          <div class="flex items-center justify-between">
+            <span class="grid h-10 w-10 place-items-center rounded-xl bg-primary-forest/10 text-lg" aria-hidden="true">♻</span>
+            <span class="font-mono text-xs font-bold text-neutral-outline">04 / TANPA JEJAK</span>
+          </div>
+          <h3 class="mt-4 text-base font-extrabold text-primary-forest dark:text-primary-fixed">Bawa turun sampah</h3>
+          <ul class="mt-3 space-y-2 text-xs leading-relaxed text-on-surface-variant">
+            <li>• Rencanakan kantong untuk membawa kembali sampah dari perjalanan.</li>
+            <li>• Jangan membuang, membakar, atau menyembunyikan sampah di jalur.</li>
+            <li>• Gunakan fasilitas sanitasi sesuai aturan kawasan.</li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-12" data-reveal>
+        <div class="rounded-2xl border border-secondary-vermilion/25 bg-secondary-vermilion/5 p-5 sm:p-6 lg:col-span-7">
+          <div class="flex items-start gap-4">
+            <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-secondary-vermilion text-xl text-white" aria-hidden="true">!</span>
+            <div>
+              <p class="font-mono text-xs font-bold uppercase tracking-wider text-secondary-vermilion">Jika kondisi memburuk</p>
+              <h3 class="mt-1 text-lg font-extrabold text-primary dark:text-white">Utamakan keselamatan, bukan puncak.</h3>
+              <p class="mt-2 text-xs leading-relaxed text-on-surface-variant">
+                Hentikan perjalanan bila ada anggota yang sakit, cuaca memburuk, atau jalur dinilai tidak aman. Tetap bersama tim, hubungi petugas atau pemandu, lalu ikuti prosedur darurat resmi setempat. Jangan mengambil risiko atau melakukan pertolongan tanpa kemampuan dan perlengkapan yang sesuai.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col justify-between gap-5 rounded-2xl border border-surface-variant bg-surface-lowest p-5 dark:bg-[#0b1611] sm:p-6 lg:col-span-5">
+          <div>
+            <p class="font-mono text-xs font-bold uppercase tracking-wider text-primary-forest dark:text-primary-fixed">Ingat sebelum mulai</p>
+            <p class="mt-2 text-sm font-semibold leading-relaxed text-on-surface">
+              Batas kemampuan tim dan keputusan untuk berbalik adalah bagian dari pendakian yang bertanggung jawab.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <a href="#destinasi" class="btn-glass inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-mono font-bold">Pilih destinasi <span>↑</span></a>
+            <a href="#pemesanan" class="btn-adventure inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-xs font-mono font-bold">Rencanakan pendakian <span>→</span></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MODAL DIALOG: DESTINATION DETAIL TELEMETRY -->
+  <dialog id="destinationModal" class="p-0 rounded-2xl backdrop:bg-neutral-slate/75 backdrop:backdrop-blur-sm shadow-2xl max-w-2xl w-full border border-surface-variant">
+    <div class="alpine-glass bg-white dark:bg-[#0d1a14] p-6 sm:p-8 space-y-5 text-on-surface">
+      
+      <div class="flex items-start justify-between border-b border-surface-variant pb-4">
+        <div>
+          <span id="modalLocation" class="text-xs font-mono font-bold text-secondary-vermilion uppercase">JAWA TIMUR</span>
+          <h3 id="modalName" class="text-2xl font-extrabold text-primary dark:text-white">Gunung Semeru</h3>
+          <p id="modalAlt" class="text-xs font-mono text-primary-forest dark:text-primary-fixed font-bold mt-0.5">3,676 MDPL</p>
+        </div>
+        <button onclick="closeDetailModal()" class="text-neutral-outline hover:text-on-surface text-2xl font-bold p-1">
+          ✕
+        </button>
+      </div>
+
+      <div class="relative h-52 rounded-xl overflow-hidden border border-surface-variant">
+        <img id="modalImage" src="asset/semeru.jpg" alt="Foto Puncak Gunung" class="w-full h-full object-cover" />
+      </div>
+
+      <div class="space-y-4 text-xs font-mono">
+        <div>
+          <p class="text-[10px] text-neutral-outline uppercase mb-1">Deskripsi Lanskap &amp; Karakteristik</p>
+          <p id="modalDesc" class="text-sm font-sans text-on-surface leading-relaxed font-normal"></p>
+        </div>
+
+        <div class="p-3.5 rounded-lg bg-surface-container space-y-1">
+          <p class="text-[10px] text-neutral-outline uppercase">Informasi Jalur Resmi:</p>
+          <p id="modalRoute" class="text-primary-forest dark:text-primary-fixed font-bold"></p>
+        </div>
+
+        <div>
+          <p class="text-[10px] text-neutral-outline uppercase mb-1">Perlengkapan Wajib yang Direkomendasikan Ranger:</p>
+          <ul id="modalEquipment" class="list-disc list-inside space-y-1 text-on-surface-variant"></ul>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-surface-variant flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-mono text-neutral-outline block">Tarif Retribusi Simaksi:</span>
+          <span id="modalPrice" class="text-lg font-bold font-mono text-primary-forest dark:text-primary-fixed">Rp55.000</span>
+        </div>
+        <div class="flex flex-wrap justify-end gap-2">
+          <button id="modalTerrainBtn" type="button" class="btn-glass px-4 py-2 rounded-lg text-xs font-mono font-semibold">
+            Lihat medan 3D
+          </button>
+          <button onclick="closeDetailModal()" class="btn-glass px-4 py-2 rounded-lg text-xs font-mono">
+            Tutup
+          </button>
+          <button id="modalBookBtn" class="btn-adventure px-5 py-2 rounded-lg text-xs font-mono font-bold uppercase disabled:cursor-not-allowed disabled:opacity-50">
+            Pesan Simaksi Jalur Ini →
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </dialog>
+
+  <!-- MOBILE FLOATING GLASS DOCK (< 640px) -->
+  <div class="sm:hidden fixed bottom-4 left-4 right-4 z-50 alpine-glass border border-surface-variant/80 rounded-2xl p-2.5 flex items-center justify-around shadow-2xl backdrop-blur-xl">
+    <a href="#destinasi" class="mobile-dock-link flex flex-col items-center text-xs font-mono font-semibold text-primary-forest dark:text-primary-fixed p-1" aria-current="false">
+      <span class="text-base">🏔️</span>
+      <span class="text-[10px]">Destinasi</span>
+    </a>
+    <a href="#tentang" class="mobile-dock-link flex flex-col items-center text-xs font-mono font-semibold text-primary-forest dark:text-primary-fixed p-1" aria-current="false">
+      <span class="text-base">ℹ️</span>
+      <span class="text-[10px]">Panduan</span>
+    </a>
+    <a href="#pemesanan" class="mobile-dock-link flex flex-col items-center text-xs font-mono font-semibold text-primary-forest dark:text-primary-fixed p-1" aria-current="false">
+      <span class="text-base">🎟️</span>
+      <span class="text-[10px]">Pesan Slot</span>
+    </a>
+    <a href="#radar3d" class="mobile-dock-link flex flex-col items-center text-xs font-mono font-semibold text-primary-forest dark:text-primary-fixed p-1" aria-current="false">
+      <span class="text-base">◈</span>
+      <span class="text-[10px]">Radar 3D</span>
+    </a>
+  </div>
+  <button id="scrollTopBtn" class="scroll-top-btn" type="button" aria-label="Kembali ke atas" title="Kembali ke atas">
+    <span aria-hidden="true">↑</span>
+  </button>
+
+  <!-- MAIN FOOTER -->
+  <footer class="bg-neutral-dark text-white border-t border-white/10 pt-16 pb-24 md:pb-16 font-mono text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 pb-12 border-b border-white/10">
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">▲</span>
+            <span class="text-base font-bold text-white tracking-wider">MOUNTAZ</span>
+          </div>
+          <p class="text-surface-dim font-sans text-xs leading-relaxed">
+            Informasi destinasi, kuota pendakian, dan simulasi reservasi SIMAKSI untuk membantu merencanakan perjalanan.
+          </p>
+        </div>
+
+        <div>
+          <p class="font-bold text-secondary-fixed mb-3">DESTINASI JALUR</p>
+          <ul class="space-y-2 text-surface-dim">
+            <li><a href="#destinasi" class="hover:text-white">Gunung Rinjani (3,726 MDPL)</a></li>
+            <li><a href="#destinasi" class="hover:text-white">Gunung Semeru (3,676 MDPL)</a></li>
+            <li><a href="#destinasi" class="hover:text-white">Gunung Lawu (3,265 MDPL)</a></li>
+            <li><a href="#destinasi" class="hover:text-white">Gunung Merbabu (3,145 MDPL)</a></li>
+            <li><a href="#destinasi" class="hover:text-white">Gunung Prau (2,565 MDPL)</a></li>
+            <li><a href="#destinasi" class="hover:text-white">Gunung Bromo (2,329 MDPL)</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <p class="font-bold text-secondary-fixed mb-3">INFORMASI LAYANAN</p>
+          <ul class="space-y-2 text-surface-dim">
+            <li><a href="#destinasi" class="hover:text-white">Cari &amp; filter destinasi</a></li>
+            <li><a href="#radar3d" class="hover:text-white">Lihat radar topografi</a></li>
+            <li><a href="#pemesanan" class="hover:text-white">Reservasi SIMAKSI</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <p class="font-bold text-secondary-fixed mb-3">PROTOKOL DISPATCH</p>
+          <p class="text-surface-dim text-[11px] leading-relaxed">
+            Data harga dan kuota pada website ini merupakan simulasi. Pastikan memeriksa informasi resmi Balai Taman Nasional sebelum memulai perjalanan.
+          </p>
+          <div class="mt-3 p-2.5 rounded bg-white/5 border border-white/10 text-[10px] text-green-300">
+            SECURE SIMAKSI GENERATOR • ACTIVE
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-neutral-outline gap-4">
+        <p>© 2026 MOUNTAZ. Website Informasi &amp; Reservasi Pendakian</p>
+        <p class="text-[11px] text-surface-dim">Muhammad 'Azizul Hakim - 25050974120</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <div id="toastContainer" class="fixed top-20 right-5 z-[100] space-y-2 pointer-events-none"></div>
+
+  <script src="script.js"></script>
+  <!-- SCRIPT ENGINE -->
+  <script>
+    /* ==========================================================================
+       MOUNTAZ ALPINE EXPEDITION GLASS ENGINE
+       Indonesian High-Altitude Mountain Expedition & Data Structure Simulation
+       ========================================================================== */
+
+    if (typeof DESTINATIONS === "undefined") {
+      console.error("MOUNTAZ: destination data was not loaded from script.js");
+    }
+
+    /* ==========================================================================
+       DARK MODE / LIGHT MODE SWITCHER ENGINE
+       ========================================================================== */
+    function toggleTheme() {
+      const isCurrentlyDark = document.documentElement.classList.contains("dark");
+      applyTheme(!isCurrentlyDark);
+      playTelemetrySound("beep", isCurrentlyDark ? 700 : 500, 0.08);
+    }
+
+    function applyTheme(isDark) {
+      if (isDark) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+
+      const icon = document.getElementById("themeIcon");
+      const label = document.getElementById("themeLabel");
+      const mobileLabel = document.getElementById("mobileThemeLabel");
+
+      if (icon) icon.textContent = isDark ? "☀️" : "🌙";
+      if (label) label.textContent = isDark ? "MODE TERANG" : "MODE MALAM";
+      if (mobileLabel) mobileLabel.textContent = isDark ? "Ganti ke Mode Terang (☀️)" : "Ganti ke Mode Malam (🌙)";
+
+      localStorage.setItem("mountaz-theme", isDark ? "dark" : "light");
+      if (typeof drawTopographicContours === "function") drawTopographicContours();
+
+      if (mountainMap) {
+        mountainMap.resize();
+      }
+    }
+
+    document.getElementById("themeToggle").addEventListener("click", toggleTheme);
+    const mobileThemeToggle = document.getElementById("mobileThemeToggle");
+    if (mobileThemeToggle) {
+      mobileThemeToggle.addEventListener("click", toggleTheme);
+    }
+
+    // Web Audio Telemetry Synthesizer
+    let audioEnabled = true;
+    let audioCtx = null;
+
+    function playTelemetrySound(type = "beep", freq = 600, duration = 0.08) {
+      if (!audioEnabled) return;
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type === "swap" ? "triangle" : type === "success" ? "sine" : "sine";
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        
+        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        // Audio policy or unsupported
+      }
+    }
+
+    // Mobile Hamburger Navigation
+    const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    mobileMenuBtn.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+    });
+    document.querySelectorAll("#mobileMenu a").forEach(link => {
+      link.addEventListener("click", () => mobileMenu.classList.add("hidden"));
+    });
+
+    // Close mobile menu and smooth scroll to section
+    function closeMobileMenu(event, sectionId) {
+      event.preventDefault();
+      mobileMenu.classList.add("hidden");
+      const target = document.getElementById(sectionId);
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    /* ==========================================================================
+       RENDER DESTINATIONS (BI-FOLD BOARDING PASS NOTCH MOTIF)
+       ========================================================================== */
+    function renderDestinationsGrid() {
+      const q = document.getElementById("searchInput").value.trim().toLowerCase();
+      const region = document.getElementById("regionFilter").value;
+      const diff = document.getElementById("diffFilter").value;
+      const sort = document.getElementById("sortSelect").value;
+
+      let list = DESTINATIONS.filter(d => {
+        const searchableText = `${d.name} ${d.location} ${d.route} ${d.description}`.toLowerCase();
+        const matchesQ = searchableText.includes(q);
+        const matchesReg = !region || d.location === region;
+        const matchesDiff = !diff || d.difficulty === diff;
+        return matchesQ && matchesReg && matchesDiff;
+      });
+
+      if (sort === "alt-desc") list.sort((a,b) => b.height - a.height);
+      else if (sort === "price-asc") list.sort((a,b) => a.price - b.price);
+      else if (sort === "name-asc") list.sort((a,b) => a.name.localeCompare(b.name));
+
+      const container = document.getElementById("destinationsGrid");
+      document.getElementById("destinationResults").textContent =
+        `Menampilkan ${list.length} dari ${DESTINATIONS.length} destinasi`;
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full alpine-glass p-8 rounded-2xl text-center text-sm font-mono text-neutral-outline border border-surface-variant">
+            Tidak ada jalur pendakian yang cocok dengan parameter filter pencarian.
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(item => {
+        const isSoldOut = item.quota === 0;
+        const isQuotaAvailable = item.availability === "Tersedia" && !isSoldOut;
+        const availabilityLabel = isSoldOut ? "Kuota habis" : item.availability;
+        const quotaPercentage = Math.round((item.quota / item.quotaTotal) * 100);
+
+        return `
+          <article data-reveal class="bifold-ticket border border-surface-variant flex flex-col justify-between dark:bg-[#0b1510]">
+            
+            <!-- Top Pass Segment with Image & Essential Metrics -->
+            <div class="ticket-top-segment">
+              <div class="relative h-48 overflow-hidden bg-surface-container dark:bg-[#08120d]">
+                <img src="${item.image}" alt="${escapeHTML(item.name)}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy" />
+                
+                <div class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-neutral-slate/85 text-white backdrop-blur-md">
+                  <span>${item.height} MDPL</span>
+                </div>
+
+                <div class="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-bold ${isQuotaAvailable ? 'bg-primary-forest text-white' : 'bg-tertiary-amber text-neutral-slate'} shadow-sm">
+                  <span class="${isQuotaAvailable ? 'pulse-dot' : 'pulse-amber'}"></span>
+                  <span>${availabilityLabel}</span>
+                </div>
+              </div>
+
+              <!-- Content details -->
+              <div class="p-6 pb-2 space-y-3">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="text-[10px] font-mono font-bold text-neutral-outline uppercase">${escapeHTML(item.location)}</span>
+                    <h3 class="text-xl font-bold text-primary dark:text-white">${escapeHTML(item.name)}</h3>
+                  </div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-surface-container dark:bg-[#08110d] text-primary-forest dark:text-primary-fixed border border-surface-variant">
+                    ${item.difficulty}
+                  </span>
+                </div>
+
+                <p class="text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
+                  ${escapeHTML(item.description)}
+                </p>
+
+                <!-- Quota Bar Gauge -->
+                <div class="pt-2 font-mono text-xs">
+                  <div class="flex justify-between text-[10px] text-neutral-outline mb-1">
+                    <span>Sisa Kuota: <strong>${item.quota} / ${item.quotaTotal}</strong></span>
+                    <span>${quotaPercentage}% Kapasitas</span>
+                  </div>
+                  <div class="w-full h-1.5 bg-surface-container dark:bg-[#060c09] rounded-full overflow-hidden">
+                    <div class="h-full ${quotaPercentage > 30 ? 'bg-primary-forest dark:bg-primary-fixed' : 'bg-secondary-vermilion'} rounded-full" style="width: ${quotaPercentage}%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bi-Fold Notch Divider -->
+            <div class="ticket-divider-wrap">
+              <div class="ticket-notch-left"></div>
+              <div class="ticket-perforation"></div>
+              <div class="ticket-notch-right"></div>
+            </div>
+
+            <!-- Lower Pass Segment (Pricing & Actions) -->
+            <div class="p-6 pt-2 bg-surface-lowest dark:bg-[#050d09] space-y-4 ticket-bottom-segment">
+              <div class="flex items-center justify-between text-xs font-mono">
+                <div>
+                  <span class="text-[10px] text-neutral-outline uppercase block">Retribusi Resmi</span>
+                  <strong class="text-base text-primary-forest dark:text-primary-fixed">${rupiah(item.price)}</strong>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-neutral-outline uppercase block">Estimasi</span>
+                  <span class="font-bold text-neutral-slate dark:text-white">${item.duration} Hari Trek</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="openDetailModal('${item.id}')" class="btn-glass py-2 rounded-lg text-xs font-mono font-semibold flex items-center justify-center gap-1">
+                  <span>Detail Jalur</span>
+                </button>
+                <button onclick="quickSelectDestination('${item.id}')" ${isSoldOut ? "disabled" : ""} class="btn-adventure py-2 rounded-lg text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-1 disabled:cursor-not-allowed disabled:opacity-50">
+                  <span>Ambil Slot</span>
+                  <span>→</span>
+                </button>
+              </div>
+            </div>
+
+          </article>
+        `;
+      }).join("");
+      revealVisibleElements(container);
+    }
+
+    function populateRegionFilter() {
+      const select = document.getElementById("regionFilter");
+      const selectedRegion = select.value;
+      const regions = [...new Set(DESTINATIONS.map(destination => destination.location))]
+        .sort((a, b) => a.localeCompare(b, "id"));
+      select.innerHTML = `<option value="">Semua Wilayah</option>${regions.map(region =>
+        `<option value="${escapeHTML(region)}">${escapeHTML(region)}</option>`
+      ).join("")}`;
+      select.value = selectedRegion;
+    }
+
+    function renderPeakStats() {
+      const highestPeak = DESTINATIONS.reduce((highest, destination) =>
+        destination.height > highest.height ? destination : highest
+      );
+      document.getElementById("peakCountStat").textContent = String(DESTINATIONS.length).padStart(2, "0");
+      document.getElementById("highestPeakStat").textContent = highestPeak.height.toLocaleString("en-US");
+      document.getElementById("highestPeakName").textContent =
+        `Puncak ${highestPeak.name.replace("Gunung ", "")} ${highestPeak.location}`;
+    }
+
+    ["searchInput", "regionFilter", "diffFilter", "sortSelect"].forEach(id => {
+      document.getElementById(id).addEventListener("input", renderDestinationsGrid);
+    });
+
+    /* ==========================================================================
+       CANVAS TOPOGRAPHIC CONTOUR WAVE (ATMOSPHERIC MIST & ISOLINES)
+       ========================================================================== */
+    const topoCanvas = document.getElementById("topoCanvas");
+    const topoCtx = topoCanvas.getContext("2d");
+    let topoWidth, topoHeight;
+
+    function resizeTopoCanvas() {
+      const hero = document.getElementById("home");
+      topoWidth = topoCanvas.width = hero.offsetWidth;
+      topoHeight = topoCanvas.height = hero.offsetHeight;
+      drawTopographicContours();
+    }
+    window.addEventListener("resize", resizeTopoCanvas);
+    resizeTopoCanvas();
+
+    function drawTopographicContours() {
+      topoCtx.clearRect(0, 0, topoWidth, topoHeight);
+      topoCtx.lineWidth = 1;
+
+      const isDark = document.documentElement.classList.contains("dark");
+      const lines = 6;
+      for (let i = 0; i < lines; i++) {
+        topoCtx.beginPath();
+        const baseHeight = (topoHeight / lines) * i + Math.sin(i) * 15;
+        topoCtx.strokeStyle = isDark 
+          ? `rgba(158, 209, 189, ${0.03 + (i * 0.008)})`
+          : `rgba(27, 77, 62, ${0.03 + (i * 0.008)})`;
+
+        for (let x = 0; x < topoWidth; x += 40) {
+          const y = baseHeight + Math.sin((x * 0.004) + (i * 0.5)) * 35
+                               + Math.cos(x * 0.008) * 20;
+          if (x === 0) topoCtx.moveTo(x, y);
+          else topoCtx.lineTo(x, y);
+        }
+        topoCtx.stroke();
+      }
+    }
+
+    /* ======================================================================
+       MAPBOX INTERACTIVE INDONESIA MAP
+       ====================================================================== */
+    const MAPBOX_PUBLIC_TOKEN = "pk.eyJ1IjoiYXppejQzMjEiLCJhIjoiY212czlhcXZkMDB4bTJ6cHdsdXN4Z29jciJ9.-VmFlEaPR_cYL39rRZI9OQ";
+    let mountainMap = null;
+    let mountainMarkers = [];
+    let selectedMountainId = "arjuno-welirang";
+    let weatherRequestController = null;
+    let weatherRequestId = 0;
+
+    function weatherDescription(code) {
+      if (code === 0) return "Cerah";
+      if (code === 1) return "Cerah berawan";
+      if (code === 2) return "Berawan sebagian";
+      if (code === 3) return "Berawan";
+      if (code === 45 || code === 48) return "Berkabut";
+      if ([51, 53, 55, 56, 57].includes(code)) return "Gerimis";
+      if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "Hujan";
+      if ([71, 73, 75, 77, 85, 86].includes(code)) return "Bersalju";
+      if ([95, 96, 99].includes(code)) return "Badai petir";
+      return "Kondisi tidak diketahui";
+    }
+
+    async function updateMountainWeather(item) {
+      const requestId = ++weatherRequestId;
+      if (weatherRequestController) weatherRequestController.abort();
+      weatherRequestController = new AbortController();
+
+      const condition = document.getElementById("weatherCondition");
+      const temperature = document.getElementById("weatherTemperature");
+      const rain = document.getElementById("weatherRain");
+      const wind = document.getElementById("weatherWind");
+      const updated = document.getElementById("weatherUpdated");
+      condition.textContent = "Mengambil data cuaca...";
+      temperature.textContent = "--°";
+      rain.textContent = "--";
+      wind.textContent = "--";
+      updated.textContent = "Memuat...";
+
+      const [longitude, latitude] = mountainCoordinates(item);
+      const params = new URLSearchParams({
+        latitude: String(latitude),
+        longitude: String(longitude),
+        current: "temperature_2m,precipitation,weather_code,wind_speed_10m",
+        timezone: "auto"
+      });
+
+      try {
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`, {
+          signal: weatherRequestController.signal
+        });
+        if (!response.ok) throw new Error(`Layanan cuaca merespons HTTP ${response.status}`);
+        const data = await response.json();
+        const current = data.current;
+        if (!current || !Number.isFinite(current.temperature_2m) ||
+            !Number.isFinite(current.precipitation) || !Number.isFinite(current.wind_speed_10m) ||
+            !Number.isFinite(current.weather_code)) {
+          throw new Error("Data cuaca yang diterima tidak lengkap.");
+        }
+        if (requestId !== weatherRequestId) return;
+
+        condition.textContent = weatherDescription(current.weather_code);
+        temperature.textContent = `${Math.round(current.temperature_2m)}°C`;
+        rain.textContent = `${current.precipitation} mm`;
+        wind.textContent = `${Math.round(current.wind_speed_10m)} km/j`;
+        const observedAt = new Date(current.time);
+        updated.textContent = Number.isNaN(observedAt.getTime())
+          ? "Terkini"
+          : observedAt.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit", timeZone: data.timezone });
+      } catch (error) {
+        if (error.name === "AbortError" || requestId !== weatherRequestId) return;
+        console.error(`Gagal memuat cuaca ${item.name}:`, error);
+        condition.textContent = "Cuaca tidak tersedia";
+        updated.textContent = "Coba lagi nanti";
+      }
+    }
+
+    function parseCoordinate(value) {
+      const match = value.match(/([\d.]+)\s*°?\s*([NSEW])/i);
+      if (!match) throw new Error(`Koordinat tidak valid: ${value}`);
+      const magnitude = Number(match[1]);
+      return /[SW]/i.test(match[2]) ? -magnitude : magnitude;
+    }
+
+    function mountainCoordinates(item) {
+      const [latitude, longitude] = item.coords.split(",").map(parseCoordinate);
+      return [longitude, latitude];
+    }
+
+    function updateSelectedMountain(item) {
+      selectedMountainId = item.id;
+      document.getElementById("radarName").textContent = `MT. ${item.name.replace("Gunung ", "").toUpperCase()}`;
+      document.getElementById("radarAlt").textContent = `${item.height.toLocaleString("id-ID")} MDPL`;
+      document.getElementById("radarCoord").textContent = item.coords;
+      updateMountainWeather(item);
+      mountainMarkers.forEach(({ item: markerItem, marker }) => {
+        marker.getElement().classList.toggle("is-active", markerItem.id === item.id);
+      });
+    }
+
+    function setRadarMountain(id) {
+      const item = DESTINATIONS.find(destination => destination.id === id);
+      if (!item) return;
+      updateSelectedMountain(item);
+      if (mountainMap) {
+        mountainMap.flyTo({ center: mountainCoordinates(item), zoom: 12, pitch: 70, bearing: -18, duration: 1800 });
+      }
+    }
+
+    function createMountainPopup(item) {
+      const content = document.createElement("div");
+      const title = document.createElement("p");
+      title.className = "font-bold text-slate-900";
+      title.textContent = item.name;
+      const altitude = document.createElement("p");
+      altitude.className = "mt-1 text-xs text-slate-600";
+      altitude.textContent = `${item.height.toLocaleString("id-ID")} mdpl · ${item.location}`;
+      const select = document.createElement("button");
+      select.type = "button";
+      select.className = "mt-3 rounded-md bg-emerald-800 px-3 py-1.5 text-xs font-semibold text-white";
+      select.textContent = "Lihat medan";
+      select.addEventListener("click", () => {
+        setRadarMountain(item.id);
+        popup.remove();
+      });
+      content.append(title, altitude, select);
+      const popup = new mapboxgl.Popup({ offset: 22, closeButton: true }).setDOMContent(content);
+      return popup;
+    }
+
+    function addMountainMarkers() {
+      mountainMarkers = [];
+      DESTINATIONS.forEach(item => {
+        let coordinates;
+        try {
+          coordinates = mountainCoordinates(item);
+        } catch (error) {
+          console.error(`Penanda ${item.name} tidak dapat ditampilkan:`, error);
+          return;
+        }
+
+        const element = document.createElement("button");
+        element.type = "button";
+        element.className = "map-mountain-marker";
+        element.textContent = "▲";
+        element.setAttribute("aria-label", `${item.name}, ${item.height.toLocaleString("id-ID")} mdpl`);
+        const marker = new mapboxgl.Marker({ element, anchor: "bottom" })
+          .setLngLat(coordinates)
+          .addTo(mountainMap);
+        const popup = createMountainPopup(item);
+        element.addEventListener("click", event => {
+          event.stopPropagation();
+          updateSelectedMountain(item);
+          popup.setLngLat(coordinates).addTo(mountainMap);
+        });
+        mountainMarkers.push({ item, marker });
+      });
+    }
+
+    function initMountainMap() {
+      const status = document.getElementById("terrainDataStatus");
+      const token = MAPBOX_PUBLIC_TOKEN;
+      if (!token.startsWith("pk.")) {
+        status.textContent = "Konfigurasi public token Mapbox belum tersedia.";
+        return;
+      }
+      if (!window.mapboxgl) {
+        status.textContent = "Library peta Mapbox gagal dimuat. Periksa koneksi internet lalu muat ulang halaman.";
+        return;
+      }
+
+      mapboxgl.accessToken = token;
+      mountainMap = new mapboxgl.Map({
+        container: "mountainMap",
+        style: "mapbox://styles/mapbox/outdoors-v12",
+        center: mountainCoordinates(DESTINATIONS.find(item => item.id === "arjuno-welirang")),
+        zoom: 12,
+        pitch: 70,
+        bearing: -18,
+        antialias: true,
+        attributionControl: true
+      });
+      mountainMap.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "top-right");
+      mountainMap.addControl(new mapboxgl.ScaleControl({ unit: "metric" }), "bottom-right");
+      mountainMap.on("style.load", () => {
+        if (!mountainMap.getSource("mountain-dem")) {
+          mountainMap.addSource("mountain-dem", {
+            type: "raster-dem",
+            url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+            tileSize: 512,
+            maxzoom: 14
+          });
+        }
+        mountainMap.setTerrain({ source: "mountain-dem", exaggeration: 1.4 });
+      });
+      mountainMap.on("load", () => {
+        addMountainMarkers();
+        updateSelectedMountain(DESTINATIONS.find(item => item.id === "arjuno-welirang"));
+        status.textContent = "Relief dan kontur 3D siap · geser peta untuk menjelajah.";
+      });
+      mountainMap.on("error", event => {
+        const httpStatus = event.error && event.error.status;
+        if (httpStatus === 429) {
+          status.textContent = "Mapbox sedang membatasi permintaan peta (HTTP 429). Tunggu sebentar lalu muat ulang.";
+        } else if (httpStatus === 401 || httpStatus === 403) {
+          console.error("Mapbox menolak token atau akses tileset:", event.error);
+          status.textContent = "Mapbox menolak token ini. Periksa public token dan izin tileset di akun Mapbox.";
+        } else {
+          console.error("Mapbox gagal memuat peta:", event.error);
+          status.textContent = "Sebagian data peta Mapbox gagal dimuat. Periksa koneksi dan pengaturan token.";
+        }
+      });
+    }
+
+    /* ==========================================================================
+       MODAL DETAIL DESTINASI
+       ========================================================================== */
+    const detailModal = document.getElementById("destinationModal");
+
+    function openDetailModal(id) {
+      const item = DESTINATIONS.find(d => d.id === id);
+      if (!item) return;
+
+      document.getElementById("modalLocation").textContent = item.location;
+      document.getElementById("modalName").textContent = item.name;
+      document.getElementById("modalAlt").textContent = `${item.height} MDPL`;
+      document.getElementById("modalDesc").textContent = item.description;
+      document.getElementById("modalRoute").textContent = item.route;
+      document.getElementById("modalPrice").textContent = rupiah(item.price);
+      
+      const modalImg = document.getElementById("modalImage");
+      if (modalImg) {
+        modalImg.src = item.image;
+        modalImg.alt = item.name;
+      }
+      
+      const eqList = document.getElementById("modalEquipment");
+      eqList.innerHTML = item.equipment.map(e => `<li>${escapeHTML(e)}</li>`).join("");
+
+      const bookBtn = document.getElementById("modalBookBtn");
+      bookBtn.disabled = item.quota === 0;
+      bookBtn.onclick = () => {
+        closeDetailModal();
+        quickSelectDestination(item.id);
+      };
+
+      document.getElementById("modalTerrainBtn").onclick = () => {
+        closeDetailModal();
+        setRadarMountain(item.id);
+        document.getElementById("radar3d").scrollIntoView({ behavior: "smooth" });
+      };
+
+      playTelemetrySound("beep", 650, 0.06);
+      detailModal.showModal();
+    }
+
+    function closeDetailModal() {
+      detailModal.close();
+    }
+
+    /* ==========================================================================
+       BOOKING FORM & SIMAKSI PASS GENERATOR ENGINE
+       ========================================================================== */
+    function populateBookingSelect(selectedId = document.getElementById("destinationSelect").value) {
+      const select = document.getElementById("destinationSelect");
+      select.innerHTML = DESTINATIONS.map(d => `
+        <option value="${d.id}" ${d.quota === 0 ? "disabled" : ""}>${escapeHTML(d.name)} — ${rupiah(d.price)} (${d.quota} slot tersisa)</option>
+      `).join("");
+      if (DESTINATIONS.some(destination => destination.id === selectedId && destination.quota > 0)) {
+        select.value = selectedId;
+      }
+
+      const hikeDate = document.getElementById("hikeDate");
+      const today = new Date();
+      hikeDate.min = today.toISOString().split("T")[0];
+      if (!hikeDate.value) {
+        today.setDate(today.getDate() + 1);
+        hikeDate.value = today.toISOString().split("T")[0];
+      }
+
+      updateBookingCalculation();
+    }
+
+    function updateBookingCalculation() {
+      const destId = document.getElementById("destinationSelect").value;
+      const count = Math.max(1, parseInt(document.getElementById("hikerCount").value) || 1);
+      const dest = DESTINATIONS.find(d => d.id === destId);
+      if (dest) {
+        const total = dest.price * count;
+        document.getElementById("bookingTotalFee").textContent = rupiah(total);
+      }
+    }
+
+    const destinationSelectEl = document.getElementById("destinationSelect");
+    const hikerCountEl = document.getElementById("hikerCount");
+    if (destinationSelectEl) {
+      destinationSelectEl.addEventListener("change", updateBookingCalculation);
+    }
+    if (hikerCountEl) {
+      hikerCountEl.addEventListener("input", updateBookingCalculation);
+    }
+
+    function quickSelectDestination(id) {
+      const destination = DESTINATIONS.find(item => item.id === id);
+      if (!destination || destination.quota <= 0) {
+        showToast(destination ? `Kuota ${destination.name} sudah habis.` : "Destinasi tidak ditemukan.", "error");
+        return;
+      }
+
+      document.getElementById("destinationSelect").value = id;
+      updateBookingCalculation();
+      document.getElementById('pemesanan').scrollIntoView({ behavior: 'smooth' });
+      document.getElementById("hikerName").focus();
+      playTelemetrySound("beep", 750, 0.08);
+    }
+
+    function readStoredBookings() {
+      try {
+        const data = localStorage.getItem("mountaz_bookings_v2");
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function renderBookingHistoryUI() {
+      const bookings = readStoredBookings();
+      const listContainer = document.getElementById("bookingHistoryList");
+      if (bookings.length === 0) {
+        listContainer.innerHTML = `<p class="text-neutral-outline">Belum ada riwayat pemesanan yang dibuat.</p>`;
+        return;
+      }
+
+      listContainer.innerHTML = bookings.slice(0, 5).map(b => `
+        <div class="p-2.5 rounded-lg bg-surface-container dark:bg-[#0c1813] flex items-center justify-between border border-surface-variant">
+          <div>
+            <strong class="text-primary-forest dark:text-primary-fixed">${escapeHTML(b.mountain)}</strong>
+            <p class="text-[10px] text-neutral-outline">${escapeHTML(b.leader)} • ${b.date} • ${b.count} Personel</p>
+          </div>
+          <div class="text-right">
+            <span class="font-bold text-secondary-vermilion">${rupiah(b.total)}</span>
+            <p class="text-[9px] text-neutral-outline">${b.hash}</p>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function clearBookingHistory() {
+      if (confirm("Hapus seluruh catatan riwayat simaksi pada browser ini?")) {
+        localStorage.removeItem("mountaz_bookings_v2");
+        renderBookingHistoryUI();
+        playTelemetrySound("beep", 350, 0.08);
+      }
+    }
+
+    /* ==========================================================================
+       TOAST NOTIFICATION SYSTEM
+       ========================================================================== */
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const bgColor = type === 'success' ? 'bg-primary-forest' : type === 'error' ? 'bg-red-600' : 'bg-tertiary-amber';
+      const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : '⚠';
+      toast.className = `pointer-events-auto ${bgColor} text-white px-5 py-3 rounded-xl shadow-2xl font-mono text-xs font-bold flex items-center gap-3 transform translate-x-full transition-transform duration-300`;
+      toast.innerHTML = `<span class="text-base">${icon}</span><span>${message}</span>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.style.transform = 'translateX(0)';
+      });
+      setTimeout(() => {
+        toast.style.transform = 'translateX(150%)';
+        setTimeout(() => toast.remove(), 350);
+      }, 4000);
+    }
+
+    /* ==========================================================================
+       PHONE VALIDATION
+       ========================================================================== */
+    function validatePhone(phone) {
+      const cleaned = phone.replace(/\s|-/g, '');
+      return /^(\+62|08)\d{8,11}$/.test(cleaned);
+    }
+
+    /* ==========================================================================
+       DYNAMIC QR CODE CANVAS DRAWING
+       ========================================================================== */
+    function drawQRCode(hashStr) {
+      const canvas = document.getElementById('qrCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const size = 80;
+      const cellSize = 8;
+      const cells = size / cellSize; // 10 cells
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+
+      // Generate pseudo-random pattern from hash
+      let seed = 0;
+      for (let i = 0; i < hashStr.length; i++) seed += hashStr.charCodeAt(i);
+      const rand = (n) => { seed = (seed * 1664525 + 1013904223) & 0xffffffff; return Math.abs(seed) % n; };
+
+      // Draw finder patterns (3 corners)
+      const drawFinder = (x, y) => {
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(x * cellSize, y * cellSize, 3 * cellSize, 3 * cellSize);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect((x+0.5) * cellSize, (y+0.5) * cellSize, 2 * cellSize, 2 * cellSize);
+        ctx.fillStyle = '#1B4D3E';
+        ctx.fillRect((x+1) * cellSize, (y+1) * cellSize, cellSize, cellSize);
+      };
+      drawFinder(0, 0);
+      drawFinder(7, 0);
+      drawFinder(0, 7);
+
+      // Fill data cells
+      for (let r = 0; r < cells; r++) {
+        for (let c = 0; c < cells; c++) {
+          // Skip finder areas
+          if ((r < 4 && c < 4) || (r < 4 && c > 5) || (r > 5 && c < 4)) continue;
+          if (rand(2) === 1) {
+            ctx.fillStyle = rand(3) === 0 ? '#E65F2B' : '#111827';
+            ctx.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+    }
+
+    /* ==========================================================================
+       RESET BOOKING FORM
+       ========================================================================== */
+    function resetBookingForm() {
+      if (!confirm("Reset formulir reservasi? Semua data yang sudah diisi akan dikosongkan.")) return;
+
+      document.getElementById('bookingForm').reset();
+      document.getElementById('passVerifiedBadge')?.classList.add('hidden');
+      updateBookingCalculation();
+      // Reset input validation classes
+      ['hikerName', 'hikerPhone'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('input-valid', 'input-error');
+      });
+    }
+
+    document.getElementById("bookingForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("hikerName").value.trim();
+      const phone = document.getElementById("hikerPhone").value.trim();
+      const destId = document.getElementById("destinationSelect").value;
+      const date = document.getElementById("hikeDate").value;
+      const count = parseInt(document.getElementById("hikerCount").value) || 1;
+
+      const dest = DESTINATIONS.find(d => d.id === destId);
+      if (!dest) return;
+
+      // Validation checks before booking
+      if (dest.quota < count) {
+        showToast(`Kuota ${dest.name} tidak mencukupi! Sisa: ${dest.quota} slot, diminta: ${count} slot.`, 'error');
+        return;
+      }
+      if (!validatePhone(phone)) {
+        showToast('Format nomor telepon tidak valid. Gunakan 08xx atau +62xx', 'error');
+        return;
+      }
+      if (!name || name.length < 3) {
+        showToast('Nama ketua rombongan minimal 3 karakter.', 'error');
+        return;
+      }
+
+      // Decrement quota slot simulation
+      dest.quota -= count;
+      populateBookingSelect(dest.id);
+
+      const total = dest.price * count;
+      const hash = `#SIMAKSI-${dest.id.substring(0,3).toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`;
+
+      // Update Live Pass View
+      document.getElementById("passMountainName").textContent = dest.name;
+      document.getElementById("passRouteName").textContent = dest.route;
+      document.getElementById("passAltitude").textContent = `${dest.height} MDPL`;
+      document.getElementById("passLeaderName").textContent = name;
+      document.getElementById("passEntryDate").textContent = date;
+      document.getElementById("passPersonCount").textContent = `${count} Pendaki`;
+      document.getElementById("passHash").textContent = hash;
+      document.getElementById("passTotalFee").textContent = rupiah(total);
+
+      document.getElementById("btnPrintTicket").disabled = false;
+
+      // Show verified badge on ticket
+      document.getElementById('passVerifiedBadge')?.classList.remove('hidden');
+
+      // Save to LocalStorage
+      const record = {
+        hash,
+        leader: name,
+        phone,
+        mountain: dest.name,
+        date,
+        count,
+        total,
+        timestamp: new Date().toISOString()
+      };
+
+      const existing = readStoredBookings();
+      existing.unshift(record);
+      localStorage.setItem("mountaz_bookings_v2", JSON.stringify(existing));
+
+      renderBookingHistoryUI();
+      renderDestinationsGrid();
+      playTelemetrySound("success", 880, 0.2);
+
+      // Show toast notification instead of alert
+      showToast(`Permit ${hash} berhasil diterbitkan! ${count} slot kuota diamankan.`, 'success');
+      document.getElementById('printTicketContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      drawQRCode(hash);
+    });
+
+    function printSimaksiPass() {
+      playTelemetrySound("beep", 780, 0.08);
+      window.print();
+    }
+
+    function revealVisibleElements(root = document) {
+      root.querySelectorAll("[data-reveal]:not(.is-visible)").forEach(element => {
+        const bounds = element.getBoundingClientRect();
+        if (bounds.top < window.innerHeight * 0.92 && bounds.bottom > 0) {
+          element.classList.add("is-visible");
+        }
+      });
+    }
+
+    function initHeroMotion() {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      document.documentElement.classList.add("hero-motion-ready");
+    }
+
+    function initSectionNavigation() {
+      const sectionIds = ["radar3d", "destinasi", "pemesanan", "tentang"];
+      const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+      const navLinks = [...document.querySelectorAll("#desktopNav .section-nav-link, .header-booking-link")];
+      const dockLinks = [...document.querySelectorAll(".mobile-dock-link")];
+      const activeLine = () => window.innerHeight * 0.34;
+      let activeFrame = 0;
+
+      const updateActiveLinks = () => {
+        const line = activeLine();
+        const activeSection = sections.find(section => {
+          const bounds = section.getBoundingClientRect();
+          return bounds.top <= line && bounds.bottom > line;
+        });
+        const activeId = activeSection?.id;
+
+        navLinks.forEach(link => {
+          const isActive = link.getAttribute("href") === `#${activeId}`;
+          link.classList.toggle("nav-active", isActive);
+          if (isActive) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+
+        dockLinks.forEach(link => {
+          const isActive = link.getAttribute("href") === `#${activeId}`;
+          link.classList.toggle("dock-active", isActive);
+          if (isActive) link.setAttribute("aria-current", "location");
+          else link.removeAttribute("aria-current");
+        });
+      };
+
+      const scheduleActiveLinkUpdate = () => {
+        if (activeFrame) return;
+        activeFrame = window.requestAnimationFrame(() => {
+          activeFrame = 0;
+          updateActiveLinks();
+        });
+      };
+
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(scheduleActiveLinkUpdate, {
+          rootMargin: "-25% 0px -60% 0px",
+          threshold: 0
+        });
+        sections.forEach(section => observer.observe(section));
+      }
+
+      window.addEventListener("scroll", scheduleActiveLinkUpdate, { passive: true });
+      window.addEventListener("resize", scheduleActiveLinkUpdate);
+      updateActiveLinks();
+    }
+
+    function initScrollEffects() {
+      const progressBar = document.getElementById("scrollProgress");
+      const scrollTopButton = document.getElementById("scrollTopBtn");
+      let progressFrame = 0;
+      const updateProgress = () => {
+        progressFrame = 0;
+        const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0;
+        progressBar.style.setProperty("--scroll-progress", String(Math.min(1, Math.max(0, progress))));
+        scrollTopButton.classList.toggle("is-visible", window.scrollY > 500);
+        if (document.documentElement.classList.contains("motion-ready")) revealVisibleElements();
+      };
+      const scheduleProgressUpdate = () => {
+        if (!progressFrame) progressFrame = window.requestAnimationFrame(updateProgress);
+      };
+      window.addEventListener("scroll", scheduleProgressUpdate, { passive: true });
+      window.addEventListener("resize", scheduleProgressUpdate);
+      scrollTopButton.addEventListener("click", () => {
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (prefersReducedMotion) {
+          document.documentElement.style.scrollBehavior = "auto";
+          window.scrollTo({ top: 0, behavior: "auto" });
+          window.requestAnimationFrame(() => document.documentElement.style.removeProperty("scroll-behavior"));
+          return;
+        }
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+      updateProgress();
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      document.querySelectorAll("section[id]:not(#home) > .max-w-7xl, #destinationsGrid > article").forEach(element => {
+        element.setAttribute("data-reveal", "");
+      });
+
+      document.documentElement.classList.add("motion-ready");
+      revealVisibleElements();
+    }
+
+    function initHeroSlideshow() {
+      const slides = Array.from(document.querySelectorAll("#heroSlideshow .hero-slide"));
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (slides.length < 2 || prefersReducedMotion) return;
+
+      let activeIndex = slides.findIndex(slide => slide.classList.contains("is-active"));
+      if (activeIndex < 0) activeIndex = 0;
+
+      window.setInterval(() => {
+        slides[activeIndex].classList.remove("is-active");
+        activeIndex = (activeIndex + 1) % slides.length;
+        slides[activeIndex].classList.add("is-active");
+      }, 5000);
+    }
+
+    /* ==========================================================================
+       APPLICATION INITIALIZATION
+       ========================================================================== */
+    window.addEventListener("DOMContentLoaded", () => {
+      initHeroSlideshow();
+      initHeroMotion();
+      initScrollEffects();
+      initSectionNavigation();
+      populateRegionFilter();
+      renderPeakStats();
+
+      // Sync Theme Buttons
+      const isDark = document.documentElement.classList.contains("dark");
+      applyTheme(isDark);
+
+      renderDestinationsGrid();
+      populateBookingSelect();
+      renderBookingHistoryUI();
+      initMountainMap();
+
+      // Real-time input validation feedback (blur events)
+      const hikerNameEl = document.getElementById('hikerName');
+      const hikerPhoneEl = document.getElementById('hikerPhone');
+
+      if (hikerNameEl) {
+        hikerNameEl.addEventListener('blur', () => {
+          const val = hikerNameEl.value.trim();
+          hikerNameEl.classList.remove('input-valid', 'input-error');
+          if (val.length >= 3) hikerNameEl.classList.add('input-valid');
+          else if (val.length > 0) hikerNameEl.classList.add('input-error');
+        });
+        hikerNameEl.addEventListener('input', () => {
+          const val = hikerNameEl.value.trim();
+          if (hikerNameEl.classList.contains('input-error') && val.length >= 3) {
+            hikerNameEl.classList.remove('input-error');
+            hikerNameEl.classList.add('input-valid');
+          }
+        });
+      }
+
+      if (hikerPhoneEl) {
+        hikerPhoneEl.addEventListener('blur', () => {
+          const val = hikerPhoneEl.value.trim();
+          hikerPhoneEl.classList.remove('input-valid', 'input-error');
+          if (val.length > 0) {
+            if (validatePhone(val)) hikerPhoneEl.classList.add('input-valid');
+            else hikerPhoneEl.classList.add('input-error');
+          }
+        });
+        hikerPhoneEl.addEventListener('input', () => {
+          const val = hikerPhoneEl.value.trim();
+          if (hikerPhoneEl.classList.contains('input-error') && validatePhone(val)) {
+            hikerPhoneEl.classList.remove('input-error');
+            hikerPhoneEl.classList.add('input-valid');
+          }
+        });
+      }
+
+      // Draw initial QR pattern
+      drawQRCode('MOUNTAZ-INIT');
+    });
+  </script>
+</body>
+</html>
