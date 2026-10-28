@@ -379,6 +379,85 @@ DESTINATIONS.forEach((destination, index) => {
   if (!destination.image) destination.image = createMountainIllustration(index);
 });
 
+/* ==========================================================================
+   MOUNTAZ LAB EXTENSION — ALGORITHMS & DATA STRUCTURE CONTEXT
+   ========================================================================== */
+
+// 1. PENJELASAN POINTER: Menghubungkan alamat objek secara berantai di memori (Linked List)
+function inisialisasiPointerLab() {
+  for (let i = 0; i < DESTINATIONS.length - 1; i++) {
+    // Properti '.next' bertindak sebagai pointer yang mereferensikan alamat objek berikutnya
+    DESTINATIONS[i].next = DESTINATIONS[i + 1];
+  }
+}
+// Eksekusi tautan pointer awal
+inisialisasiPointerLab();
+
+
+// 2. INDIKATOR 1: SORTING MANUAL (Selection Sort) + BACKEND LOG LOGGING
+function backendSelectionSort(kriteria) {
+  let arr = [...DESTINATIONS]; // Salin array asli agar referensi data awal aman
+  let n = arr.length;
+  
+  console.log(`%c[SORT START] Mengurutkan data berdasarkan: ${kriteria}`, "color: #00f2fe; font-weight: bold;");
+
+  for (let i = 0; i < n - 1; i++) {
+    let indeksEkstrim = i;
+    for (let j = i + 1; j < n; j++) {
+      
+      // Evaluasi Kondisi Berdasarkan Kriteria
+      if (kriteria === "height" && arr[j].height > arr[indeksEkstrim].height) {
+        indeksEkstrim = j;
+      } else if (kriteria === "price" && arr[j].price < arr[indeksEkstrim].price) {
+        indeksEkstrim = j;
+      } else if (kriteria === "name" && arr[j].name.localeCompare(arr[indeksEkstrim].name) < 0) {
+        indeksEkstrim = j;
+      }
+    }
+    
+    // Proses Swap/Penukaran posisi melalui manipulasi Pointer Referensi Objek
+    if (indeksEkstrim !== i) {
+      console.log(`[SWAP] Menukar data Indeks [${i}] ${arr[i].name} dengan Indeks [${indeksEkstrim}] ${arr[indeksEkstrim].name}`);
+      let temp = arr[i];
+      arr[i] = arr[indeksEkstrim];
+      arr[indeksEkstrim] = temp;
+    }
+  }
+  
+  console.log("%c[SORT SELESAI] Data berhasil ditata kembali di RAM.", "color: #7ee787;");
+  return arr;
+}
+
+
+// 3. INDIKATOR 2: SEARCHING MANUAL (Linear Search) + BACKEND LOG LOGGING
+function backendLinearSearch(kataKunci) {
+  let query = kataKunci.toLowerCase();
+  let hasil = [];
+  
+  console.log(`%c[SEARCH START] Mencari kata kunci: "${kataKunci}"`, "color: #00f2fe; font-weight: bold;");
+
+  // Penelusuran linier dari indeks awal (0) hingga batas akhir array (n-1)
+  for (let i = 0; i < DESTINATIONS.length; i++) {
+    console.log(`[Iterasi ke-${i}] Memeriksa alamat memori Node: ${DESTINATIONS[i].name}`);
+    
+    if (DESTINATIONS[i].name.toLowerCase().includes(query)) {
+      console.log(`%c   [FOUND] Indeks ke-${i} cocok!`, "color: #7ee787;");
+      hasil.push(DESTINATIONS[i]);
+      
+      // Menampilkan informasi Pointer dari data yang diketemukan
+      if (DESTINATIONS[i].next) {
+        console.log(`   [POINTER INFO] Node saat ini menunjuk ke alamat Node: ${DESTINATIONS[i].next.name}`);
+      }
+    }
+  }
+  
+  if (hasil.length === 0) {
+    console.log("%c[SEARCH GAGAL] Data tidak ditemukan.", "color: #ff7b72;");
+  }
+  return hasil;
+}
+
+
 const rupiah = (val) => `Rp${Number(val).toLocaleString("id-ID")}`;
 const escapeHTML = (str) => String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
